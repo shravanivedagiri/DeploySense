@@ -2,14 +2,16 @@
 import json
 import os
 import time
+from collections import defaultdict, deque
 from pathlib import Path
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from starlette.concurrency import run_in_threadpool
 
+from . import ask
 from .agent import TroubleshootingAgent
 from .llm import load_env_file
 from .plugins import PLUGINS
@@ -20,6 +22,8 @@ SAMPLES = ROOT / "samples"
 FEEDBACK_FILE = Path(os.getenv("FEEDBACK_FILE", ROOT / "data" / "feedback.jsonl"))
 MAX_UPLOAD_BYTES = int(os.getenv("MAX_UPLOAD_MB", "5")) * 1024 * 1024
 ALLOWED_SUFFIXES = {".log", ".txt", ".json", ".jsonl", ".out", ""}
+MAX_ASK_BYTES = 200 * 1024
+ASK_LIMIT_PER_MINUTE = 10
 
 # Samples offered in the dashboard. A success log is attached where a comparison makes sense.
 SAMPLE_SETS = [
@@ -82,6 +86,41 @@ async def analyze(failed_log: str = Form(""), success_log: str = Form(""), use_l
         raise HTTPException(413, f"The pasted log is larger than {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.")
     # The agent makes blocking network calls; run it in a worker thread so other requests are not held up.
     return await run_in_threadpool(agent.analyze, failed, success or None, use_llm=use_llm)
+
+
+_ask_times: dict[str, deque] = defaultdict(deque)
+
+
+def _ask_allowed(ip: str) -> bool:
+    """At most ASK_LIMIT_PER_MINUTE questions per client IP in any 60 second window. Kept in memory only."""
+    now, times = time.monotonic(), _ask_times[ip]
+    while times and now - times[0] > 60:
+        times.popleft()
+    if len(times) >= ASK_LIMIT_PER_MINUTE:
+        return False
+    times.append(now)
+    return True
+
+
+@app.post("/api/ask")
+async def ask_question(request: Request):
+    """Answer a follow-up question about one report. Stateless: the browser sends the context, nothing is stored."""
+    too_big = HTTPException(413, "The question and its context are larger than 200 KB.")
+    if int(request.headers.get("content-length") or 0) > MAX_ASK_BYTES:
+        raise too_big
+    body = await request.body()
+    if len(body) > MAX_ASK_BYTES:
+        raise too_big
+    try:
+        req = ask.AskRequest.model_validate_json(body)
+    except ValidationError:
+        raise HTTPException(400, "The question or its context is not in the expected format.")
+    if not req.question.strip():
+        raise HTTPException(400, "Type a question first.")
+    if not _ask_allowed(request.client.host if request.client else "unknown"):
+        raise HTTPException(429, "Too many questions. Wait a minute and try again.")
+    # The model call blocks on the network; run it in a worker thread so other requests are not held up.
+    return await run_in_threadpool(ask.answer, agent.llm, req)
 
 
 @app.get("/api/samples")

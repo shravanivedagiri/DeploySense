@@ -186,6 +186,7 @@ function renderReport(r) {
   renderTrace(q("trace"), q("other-findings"), r);
   q("elapsed").textContent = r.elapsed_ms < 1000 ? `${r.elapsed_ms} ms` : `${(r.elapsed_ms / 1000).toFixed(1)}s`;
   bindFeedback(node, r);
+  bindAsk(node, r);
 
   const caseEl = $("#case");
   caseEl.innerHTML = "";
@@ -320,6 +321,129 @@ function bindFeedback(node, r) {
   };
   yes.addEventListener("click", () => send(true));
   no.addEventListener("click", () => send(false));
+}
+
+// ---------- follow-up questions ----------
+const ASK_OFF = "Follow-up questions need the AI agent, which is off right now.";
+const ASK_LINES = 150;
+
+function bindAsk(node, r) {
+  const q = (k) => node.querySelector(`[data-js="${k}"]`);
+  const log = q("ask-log"), form = q("ask-form"), input = q("ask-input"), send = q("ask-send");
+  const err = q("ask-error"), suggest = q("ask-suggest");
+  const history = [];
+  let busy = false, off = false;
+
+  const setBusy = (on) => {
+    busy = on;
+    input.disabled = send.disabled = on || off;
+    suggest.querySelectorAll("button").forEach((b) => { b.disabled = on || off; });
+  };
+  const turnOff = (reason) => {
+    off = true;
+    setBusy(false);
+    log.innerHTML = `<p class="ask-off">${esc(ASK_OFF)}${reason ? ` <span class="muted">Reason: ${esc(reason)}.</span>` : ""}</p>`;
+  };
+  const addMsg = (role, html) => {
+    const div = document.createElement("div");
+    div.className = "ask-msg";
+    div.dataset.role = role;
+    div.innerHTML = `<p class="who">${role === "user" ? "You" : "DeploySense"}</p><div class="ask-body">${html}</div>`;
+    log.querySelector(".ask-empty")?.remove();
+    log.appendChild(div);
+    log.scrollTop = log.scrollHeight;
+    return div;
+  };
+
+  suggest.innerHTML = askSuggestions(r).map((s) => `<button type="button" class="btn btn-quiet">${esc(s)}</button>`).join("");
+  log.innerHTML = `<p class="muted ask-empty">Ask why this cause was chosen, what to check first, or what a log line means.</p>`;
+  if (r.mode !== "llm") turnOff(null);
+
+  async function submit(question) {
+    err.textContent = "";
+    if (off || busy) return;
+    if (!question.trim()) { err.textContent = "Type a question first."; input.focus(); return; }
+    addMsg("user", `<p>${esc(question)}</p>`);
+    input.value = "";
+    setBusy(true);
+    const thinking = addMsg("assistant", `<p class="ask-thinking">Thinking</p>`);
+    try {
+      const res = await api("/api/ask", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question, history: history.slice(-6), context: askContext(r) }) });
+      if (state.report?.id !== r.id) return;  // a new analysis replaced this panel
+      thinking.remove();
+      if (!res.available) { turnOff(res.reason); return; }
+      if (res.error) { addMsg("assistant", `<p>${esc(res.error)}</p>`); return; }
+      addMsg("assistant", askAnswerHtml(res));
+      history.push({ role: "user", content: question }, { role: "assistant", content: res.answer });
+    } catch (e) {
+      thinking.remove();
+      err.textContent = e.message;
+    } finally {
+      setBusy(false);
+      if (!off) input.focus();
+    }
+  }
+
+  form.addEventListener("submit", (ev) => { ev.preventDefault(); submit(input.value); });
+  input.addEventListener("input", () => { err.textContent = ""; });
+  suggest.addEventListener("click", (ev) => { const b = ev.target.closest("button"); if (b) submit(b.textContent); });
+  log.addEventListener("click", async (ev) => {
+    const b = ev.target.closest(".copy");
+    if (!b) return;
+    try {
+      await navigator.clipboard.writeText(b.closest(".cmd").querySelector("code").textContent);
+      b.innerHTML = icon("check", 15);
+      b.setAttribute("aria-label", "Copied");
+      setTimeout(() => { b.innerHTML = icon("copy", 15); b.setAttribute("aria-label", "Copy command"); }, 1400);
+    } catch { b.setAttribute("aria-label", "Copy failed. Select the text instead."); }
+  });
+}
+
+function askSuggestions(r) {
+  const lower = (t) => (/^[A-Z][a-z]/.test(t) ? t[0].toLowerCase() + t.slice(1) : t);
+  const symptom = r.findings.find((f) => f.symptom && f.kb_id !== r.root_cause.kb_id);
+  return ["Why is this the root cause?", "What should I check first?",
+    symptom ? `Why is ${lower(symptom.title)} not the cause?` : "How do I stop this from happening again?"];
+}
+
+// Compact context for /api/ask: the report plus at most 150 masked log lines
+// (evidence lines, then 5 lines around each, then other error and warning lines).
+function askContext(r) {
+  const rc = r.root_cause, byId = new Map(r.events.map((e) => [e.id, e])), ids = new Set();
+  const add = (id) => { if (byId.has(id) && ids.size < ASK_LINES) ids.add(id); };
+  const evidence = [...rc.evidence_ids].sort((a, b) => a - b);
+  evidence.forEach(add);
+  evidence.forEach((id) => { for (let k = id - 5; k <= id + 5; k++) add(k); });
+  r.events.filter((e) => ["FATAL", "ERROR", "WARN"].includes(e.level)).forEach((e) => add(e.id));
+  return {
+    summary: (r.summary || "").slice(0, 3000),
+    root_cause: { title: rc.title, kb_id: rc.kb_id, explanation: rc.explanation, component: rc.component,
+      first_line: rc.first_line, evidence_ids: rc.evidence_ids },
+    confidence: { level: r.confidence.level, reasons: r.confidence.reasons },
+    findings: r.findings.slice(0, 30).map((f) => ({ title: f.title.slice(0, 200), symptom: f.symptom, first_line: f.first_line,
+      evidence_ids: f.evidence_ids.slice(0, 20) })),
+    fixes: r.fixes.slice(0, 12).map((f) => ({ title: f.title.slice(0, 300), command: f.command.slice(0, 1000), risk: f.risk })),
+    links: r.timeline.links.slice(0, 20).map((l) => l.explanation || ""),
+    lines: [...ids].sort((a, b) => a - b).map((id) => ({ id, text: byId.get(id).raw.slice(0, 600) })),
+  };
+}
+
+// Model text is escaped first; only line ids the server confirmed become links.
+function askAnswerHtml(res) {
+  const cited = new Set(res.cited);
+  const text = esc(res.answer).replace(/\bL(\d+)\b/g, (m, n) =>
+    cited.has(+n) ? `<button type="button" class="line-link" data-line="${n}">L${n}</button>` : m);
+  let html = res.general ? `<p class="ask-tag">General answer, not based on this log</p>` : "";
+  html += text.split(/\n{2,}/).map((p) => `<p>${p.replace(/\n/g, "<br>")}</p>`).join("");
+  if (res.note) html += `<p class="ask-note">${esc(res.note)}</p>`;
+  html += res.commands.map((c) => `
+    <div class="ask-cmd">
+      <div class="fix-head"><span class="fix-meta">${esc(c.title || "Suggested command")}</span><span class="risk" data-risk="${esc(c.risk)}" title="${esc(c.risk_reason)}">${esc(RISK[c.risk])}</span></div>
+      <div class="cmd"><pre><code>${esc(c.command)}</code></pre><button type="button" class="copy" aria-label="Copy command">${icon("copy", 15)}</button></div>
+      ${c.recommended ? `<p class="fix-meta">${esc(c.risk_reason)}</p>` : `<p class="ask-warn">Not recommended. ${esc(c.risk_reason)} Take a backup and get approval before running anything like this.</p>`}
+    </div>`).join("");
+  return html;
 }
 
 // ---------- failure map ----------

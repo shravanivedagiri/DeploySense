@@ -100,6 +100,18 @@
         <p class="notice" data-js="notice" hidden></p>
       </header>
 
+      <section class="panel ask-panel" aria-labelledby="ask-h">
+        <div class="panel-head"><h3 id="ask-h">Ask about this failure</h3><span class="muted" data-js="ask-scope">Answers use only this report and its log</span></div>
+        <div class="ask-log" data-js="ask-log" aria-live="polite"></div>
+        <div class="ask-suggest" data-js="ask-suggest"></div>
+        <form class="ask-form" data-js="ask-form" novalidate>
+          <label class="visually-hidden" for="ask-input">Your question</label>
+          <input type="text" id="ask-input" class="ask-input" data-js="ask-input" maxlength="1000" autocomplete="off" placeholder="Ask a question about this failure">
+          <button type="submit" class="btn" data-js="ask-send">Ask</button>
+        </form>
+        <p class="form-error" data-js="ask-error" role="alert"></p>
+      </section>
+
       <section class="panel map-panel" aria-labelledby="map-h">
         <div class="panel-head">
           <h3 id="map-h">How the failure spread</h3>
@@ -123,17 +135,16 @@
         <div class="node-detail" data-js="node-detail"><p class="muted">Select a component to see its log lines.</p></div>
       </section>
 
-      <div class="columns">
-        <section class="panel" aria-labelledby="ev-h">
-          <div class="panel-head"><h3 id="ev-h">Evidence</h3><button type="button" class="btn btn-quiet" data-js="full-log">Show full log</button></div>
-          <div class="logview" data-js="evidence"></div>
-        </section>
-        <section class="panel" aria-labelledby="fix-h">
-          <div class="panel-head"><h3 id="fix-h">Fix plan</h3><span class="muted" data-js="fix-count"></span></div>
-          <ol class="fixes" data-js="fixes"></ol>
-          <p class="prevention" data-js="prevention"></p>
-        </section>
-      </div>
+      <section class="panel" aria-labelledby="ev-h">
+        <div class="panel-head"><h3 id="ev-h">Evidence</h3><button type="button" class="btn btn-quiet" data-js="full-log">Show full log</button></div>
+        <div class="logview" data-js="evidence"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="fix-h">
+        <div class="panel-head"><h3 id="fix-h">Fix plan</h3><span class="muted" data-js="fix-count"></span></div>
+        <ol class="fixes" data-js="fixes"></ol>
+        <p class="prevention" data-js="prevention"></p>
+      </section>
 
       <section class="panel" aria-labelledby="tl-h">
         <div class="panel-head"><h3 id="tl-h">Timeline</h3><span class="muted" data-js="tl-source"></span></div>
