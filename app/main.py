@@ -8,8 +8,10 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from starlette.concurrency import run_in_threadpool
 
 from .agent import TroubleshootingAgent
+from .llm import load_env_file
 from .plugins import PLUGINS
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -36,16 +38,7 @@ app = FastAPI(title="DeploySense AI", version="1.0.0", docs_url="/api/docs", red
 agent = TroubleshootingAgent()
 
 
-def _load_env_file() -> None:
-    env = ROOT / ".env"
-    if env.exists():
-        for line in env.read_text().splitlines():
-            if "=" in line and not line.strip().startswith("#"):
-                k, v = line.split("=", 1)
-                os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
-
-
-_load_env_file()
+load_env_file(ROOT / ".env")
 agent.llm.api_key = os.getenv("GROQ_API_KEY", "")
 agent.llm.model = os.getenv("GROQ_MODEL", agent.llm.model)
 
@@ -65,7 +58,16 @@ async def _read_upload(upload: UploadFile | None) -> str | None:
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "llm": "groq" if agent.llm.available else "off", "model": agent.llm.model if agent.llm.available else None,
+    """llm is "off" without a key, "error" when the key is set but the model check or the last request failed."""
+    llm, model, reason = "off", None, None
+    if agent.llm.available:
+        model = agent.llm.model
+        if agent.llm.last_error:
+            reason = f"last request failed: {agent.llm.last_error}"
+        elif check := agent.llm.check():
+            reason = check
+        llm = "error" if reason else "groq"
+    return {"status": "ok", "llm": llm, "model": model, "llm_error": reason,
             "plugins": [{"name": p.name, "label": p.label, "description": p.description} for p in PLUGINS]}
 
 
@@ -78,7 +80,8 @@ async def analyze(failed_log: str = Form(""), success_log: str = Form(""), use_l
         raise HTTPException(400, "Add the log from the failed deployment, as a file or pasted text.")
     if len(failed.encode()) > MAX_UPLOAD_BYTES:
         raise HTTPException(413, f"The pasted log is larger than {MAX_UPLOAD_BYTES // (1024 * 1024)} MB.")
-    return agent.analyze(failed, success or None, use_llm=use_llm)
+    # The agent makes blocking network calls; run it in a worker thread so other requests are not held up.
+    return await run_in_threadpool(agent.analyze, failed, success or None, use_llm=use_llm)
 
 
 @app.get("/api/samples")

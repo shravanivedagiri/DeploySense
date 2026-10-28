@@ -18,17 +18,19 @@ shravanivedagiri@Mac deploysense % python3 -m venv .venv && source .venv/bin/act
 
 Open http://localhost:8000 and pick a sample log, or paste your own.
 
-Without `GROQ_API_KEY` the app still works in rule-engine mode, and the header says so. Get a free key at https://console.groq.com.
+The agent uses `openai/gpt-oss-120b` on Groq (`GROQ_MODEL` in `.env`). Without `GROQ_API_KEY` the app still works in rule-engine mode, and the header says so. If the key is set but Groq fails (rejected key, unknown model, rate limit), the header shows the reason and each report says it came from the rule engine. Get a free key at https://console.groq.com.
+
+The free Groq tier allows about 8,000 tokens per minute and one analysis uses roughly 4,000 to 10,000, so back-to-back analyses can be rate limited. The client waits and retries when Groq asks for a short wait, and falls back to the rule engine otherwise.
 
 Everything the page needs (three.js, fonts, icons) is served from `frontend/vendor`, so the demo works without internet access in rule-engine mode.
 
 ## Test and measure
 
 ```zsh
-(.venv) shravanivedagiri@Mac deploysense % pytest -q                        # 13 tests, no network needed
+(.venv) shravanivedagiri@Mac deploysense % pytest -q                        # 33 tests, never uses the network or your key
 (.venv) shravanivedagiri@Mac deploysense % python scripts/generate_logs.py  # rebuild the 46-log test set
 (.venv) shravanivedagiri@Mac deploysense % python scripts/evaluate.py       # rule engine accuracy
-(.venv) shravanivedagiri@Mac deploysense % python scripts/evaluate.py --llm # full agent, needs GROQ_API_KEY
+(.venv) shravanivedagiri@Mac deploysense % python scripts/evaluate.py --llm # full agent, reads .env, paces calls (--pause 20)
 ```
 
 Current result: the rule engine picks the labelled root cause on 46 of 46 synthetic logs. Read that number with care: the test logs and the knowledge base were written by the same team, so it shows the ranking logic works (cause chosen over symptoms such as CrashLoopBackOff and 502), not real-world accuracy. Before the demo, add public logs (for example from Loghub or GitHub issues) to `samples/eval` and run `evaluate.py --llm`.

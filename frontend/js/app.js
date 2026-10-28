@@ -47,6 +47,10 @@ function renderEngine(h) {
     el.textContent = `AI agent on, ${h.model} via Groq`;
     el.dataset.state = "on";
     note.textContent = `(${h.model})`;
+  } else if (h.llm === "error") {
+    el.textContent = `AI agent unavailable, ${h.llm_error}. Reports use the rule engine`;
+    el.dataset.state = "error";
+    note.textContent = `(${h.model}, currently failing)`;
   } else {
     el.textContent = "AI agent off, rule engine only";
     el.dataset.state = "off";
@@ -128,6 +132,7 @@ async function runAnalysis() {
     const report = await api("/api/analyze", { method: "POST", body });
     state.report = report;
     renderReport(report);
+    if (state.health?.llm !== "off") api("/api/health").then((h) => { state.health = h; renderEngine(h); }).catch(() => {});
   } catch (e) {
     $("#case").innerHTML = `<div class="empty"><h2>Analysis failed</h2><p>${esc(e.message)}</p></div>`;
   } finally {
@@ -164,7 +169,7 @@ function renderReport(r) {
   q("summary").textContent = r.summary;
   if (r.llm_error) {
     q("notice").hidden = false;
-    q("notice").textContent = "The AI agent could not be reached, so this diagnosis comes from the rule engine.";
+    q("notice").textContent = `The AI agent failed (${r.llm_error}), so this diagnosis comes from the rule engine.`;
   } else if (r.stats.truncated) {
     q("notice").hidden = false;
     q("notice").textContent = "This log was longer than 20,000 lines; only the first 20,000 were analysed.";

@@ -2,7 +2,7 @@
 
 Hackathon entry for TCS Technology Day, problem "IT Application Maintenance: Deployment Issue Troubleshooting Assistant". A single agent reads a failed deployment log, finds the probable root cause, cites the log lines that support it, replays how the failure spread, and proposes fixes that are risk-checked but never executed.
 
-Stack: Python 3.10+ (FastAPI, httpx), vanilla JS dashboard with three.js, Groq chat completions (OpenAI-compatible API) for the optional LLM.
+Stack: Python 3.10+ (FastAPI, httpx), vanilla JS dashboard with three.js, Groq chat completions (OpenAI-compatible API, model `openai/gpt-oss-120b`) for the optional LLM.
 
 ## Request flow
 
@@ -52,16 +52,17 @@ pip install -r requirements.txt
 cp .env.example .env              # GROQ_API_KEY, GROQ_MODEL, MAX_UPLOAD_MB
 uvicorn app.main:app --reload     # http://localhost:8000
 
-python -m pytest -q               # plain `pytest -q` fails to import `app` (no pythonpath config yet)
-GROQ_API_KEY= python -m pytest -q # hermetic run; otherwise "rule mode" tests call Groq via the .env key
+pytest -q                         # pytest.ini sets pythonpath; tests/conftest.py blanks the key and blocks httpx
 python scripts/evaluate.py        # rule engine on samples/eval (writes samples/eval/results.json)
-python scripts/evaluate.py --llm  # full agent; currently needs GROQ_API_KEY exported, it does not read .env
+python scripts/evaluate.py --llm  # full agent; reads .env, --pause between logs, writes results_llm.json
 python scripts/generate_logs.py   # regenerate the 46 synthetic eval logs and labels.json
 ```
 
 `app/main.py` loads `.env` at import with `os.environ.setdefault`, so an exported variable wins over `.env`.
 
-Status at 2026-10-28: 13/13 tests pass; rule engine 46/46 on the synthetic set (optimistic, see rules). The default `GROQ_MODEL` `llama-3.3-70b-versatile` returns 404 on Groq for this key, so AI mode currently always falls back to rules.
+Model: `openai/gpt-oss-120b` (Llama 3.3 70B is no longer available on Groq). Free tier limit is 8,000 tokens per minute; one analysis uses about 4k to 10k, so rate limits are expected. `GroqClient` retries 429/5xx with the wait Groq asks for (up to 4 retries, waits over 30s fail at once), stores `last_error`, and `check()` verifies key and model via `GET /models/{model}` (cached 60s) for `/api/health`. `GroqClient(api_key="")` means no LLM; only `None` reads the environment.
+
+Robustness: `_line_arg` accepts `12` or `L12`; `clean_ai_answer` coerces the model's JSON or returns None (fall back to rules); any other exception in the loop also falls back. `/api/analyze` runs the agent with `run_in_threadpool`.
 
 ## Adding a plugin
 

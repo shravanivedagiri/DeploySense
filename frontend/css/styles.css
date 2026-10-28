@@ -52,6 +52,7 @@ code, pre, .mono { font-family: var(--mono); }
 .engine::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--rule); }
 .engine[data-state="on"]::before { background: var(--ok-lamp); }
 .engine[data-state="off"]::before { background: var(--caution-lamp); }
+.engine[data-state="error"]::before { background: var(--fault); }
 
 /* ---------- layout ---------- */
 .workspace { display: grid; grid-template-columns: minmax(320px, 380px) minmax(0, 1fr); gap: 24px; padding: 24px; max-width: 1480px; margin: 0 auto; align-items: start; }

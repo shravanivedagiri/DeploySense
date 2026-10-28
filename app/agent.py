@@ -1,6 +1,7 @@
 """The single troubleshooting agent. It decides which plugins to call, combines their findings,
 and returns one validated report. Facts (parsing, ordering, risk) come from code; the LLM reasons and explains."""
 import json
+import re
 import time
 import uuid
 
@@ -74,6 +75,52 @@ def _fmt_t(t) -> str:
     return f"{round(t, 1):g}s" if t is not None else "unknown time"
 
 
+def _line_arg(value) -> int | None:
+    """Accept a line id as 12, 12.0, "12" or "L12". Anything else is None."""
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return int(value)
+    m = re.fullmatch(r"\s*[Ll]?(\d+)\s*", str(value)) if isinstance(value, str) else None
+    return int(m.group(1)) if m else None
+
+
+def clean_ai_answer(raw) -> dict | None:
+    """Coerce the model's JSON into the expected shape. Returns None if it cannot be used,
+    so the rule engine answers instead. Line ids are still checked against the log later."""
+    if not isinstance(raw, dict) or not isinstance(raw.get("root_cause"), dict):
+        return None
+
+    def text(v) -> str:
+        return str(v).strip() if isinstance(v, (str, int, float)) and not isinstance(v, bool) else ""
+
+    def lines(v) -> list:
+        if isinstance(v, (str, int)) and not isinstance(v, bool):
+            return re.findall(r"\d+", str(v))
+        return [x for x in v if isinstance(x, (str, int)) and not isinstance(x, bool)] if isinstance(v, list) else []
+
+    def dicts(v) -> list[dict]:
+        return [x for x in v if isinstance(x, dict)] if isinstance(v, list) else []
+
+    rc = raw["root_cause"]
+    kb_id = text(rc.get("kb_id"))
+    return {
+        "summary": text(raw.get("summary")),
+        "root_cause": {"title": text(rc.get("title")), "explanation": text(rc.get("explanation")),
+                       "kb_id": kb_id if kb_id.lower() not in ("", "null", "none") else None,
+                       "component": text(rc.get("component")), "evidence_lines": lines(rc.get("evidence_lines"))},
+        "contributing_factors": [{"description": text(c.get("description")), "evidence_lines": lines(c.get("evidence_lines"))}
+                                 for c in dicts(raw.get("contributing_factors"))],
+        "fixes": [{"title": text(f.get("title")), "command": text(f.get("command")), "verify": text(f.get("verify")),
+                   "why": text(f.get("why")) or None} for f in dicts(raw.get("fixes"))],
+        "timeline_explanations": [{"from": text(x.get("from")), "to": text(x.get("to")),
+                                   "explanation": text(x.get("explanation"))} for x in dicts(raw.get("timeline_explanations"))],
+        "prevention": text(raw.get("prevention")) or None,
+        "open_questions": [text(q) for q in raw.get("open_questions") or [] if text(q)]
+        if isinstance(raw.get("open_questions"), list) else [],
+    }
+
+
 class TroubleshootingAgent:
     def __init__(self, llm: GroqClient | None = None):
         self.llm = llm or GroqClient()
@@ -123,13 +170,19 @@ class TroubleshootingAgent:
 
         if use_llm and self.llm.available:
             try:
-                ai, agent_trace = self._run_llm_agent(parsed, diff, run_plugin, unmatched)
-                trace += agent_trace
-                llm_used = ai is not None
-                if ai is None:
-                    llm_error = "The model did not return valid JSON."
+                raw, agent_trace = self._run_llm_agent(parsed, diff, run_plugin, unmatched)
+                ai = clean_ai_answer(raw)
+                if ai is not None:
+                    trace += agent_trace
+                    llm_used = True
+                elif raw is None:
+                    llm_error = "the model did not return valid JSON"
+                else:
+                    llm_error = "the model's answer did not match the required format"
             except LLMError as exc:
                 llm_error = str(exc)
+            except Exception as exc:  # malformed model output must never turn into a 500; the rule engine answers instead
+                llm_error = f"unexpected model output ({type(exc).__name__})"
         if not llm_used:
             for p in PLUGINS:
                 if p.name in cache:
@@ -179,10 +232,12 @@ class TroubleshootingAgent:
                 return result, trace
             messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls})
             for call in calls:
-                name = call["function"]["name"]
+                name = str((call.get("function") or {}).get("name"))
                 try:
                     args = json.loads(call["function"].get("arguments") or "{}")
-                except json.JSONDecodeError:
+                except (json.JSONDecodeError, TypeError):
+                    args = {}
+                if not isinstance(args, dict):
                     args = {}
                 if name in PLUGIN_BY_NAME:
                     found = run_plugin(name)
@@ -194,14 +249,17 @@ class TroubleshootingAgent:
                     payload = {"results": kb.search(str(args.get("query", "")))}
                     detail = f"query \"{str(args.get('query', ''))[:60]}\", {len(payload['results'])} result(s)"
                 elif name == "get_log_lines":
-                    s = int(args.get("start", 1))
-                    e = min(int(args.get("end", s)), s + 40)
-                    payload = {"lines": [f"L{i} {events_by_id[i].raw[:300]}" for i in range(s, e + 1) if i in events_by_id]}
-                    detail = f"lines {s} to {e}"
+                    s, e = _line_arg(args.get("start")), _line_arg(args.get("end"))
+                    if s is None:
+                        payload, detail = {"error": "start must be a line id such as 12 or L12"}, "invalid line range"
+                    else:
+                        e = min(e if e is not None and e >= s else s, s + 40)
+                        payload = {"lines": [f"L{i} {events_by_id[i].raw[:300]}" for i in range(s, e + 1) if i in events_by_id]}
+                        detail = f"lines {s} to {e}"
                 else:
                     payload, detail = {"error": f"unknown tool {name}"}, "unknown tool"
                 trace.append({"step": name, "detail": detail, "by": "llm", "ms": _ms(t0)})
-                messages.append({"role": "tool", "tool_call_id": call["id"], "content": json.dumps(payload)[:12000]})
+                messages.append({"role": "tool", "tool_call_id": call.get("id", ""), "content": json.dumps(payload)[:12000]})
 
         messages.append({"role": "user", "content": "Stop calling tools. Reply with the JSON object now."})
         final = self.llm.chat(messages, json_mode=True)

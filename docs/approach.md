@@ -45,7 +45,7 @@ Facts come from code; reasoning and explanation come from the LLM.
 
 ## 3. The single agent
 
-`app/agent.py` runs one agent (Llama 3.3 70B on Groq, temperature 0.1) with five tools:
+`app/agent.py` runs one agent (`openai/gpt-oss-120b` on Groq, temperature 0.1) with five tools:
 
 - `docker_plugin`: build failures (npm, pip, native modules, COPY), registry pull and auth, OOMKilled, exit codes, port conflicts, disk full. Extracts the failing build step, base image, exit code and its meaning.
 - `database_plugin`: connection refused or timed out, wrong credentials, missing database, unapplied migrations, pool exhaustion, TLS. Detects PostgreSQL, MySQL, MongoDB or Redis and rewrites commands for MySQL.
@@ -64,7 +64,7 @@ Every plugin also implements one contract, `can_handle(parsed)` and `analyze(par
 3. **Evidence check.** Line ids cited by the LLM that do not exist in the log are removed and the removal is reported.
 4. **Confidence from signals, not from the model.** High: a rule matched, evidence exists, the match is a cause, and the AI agrees with the rule engine. Medium: evidence exists but the match is only a symptom, the AI disagreed, or only the AI found it. Low: no rule and no confirmed evidence. The report lists the reasons.
 5. **Specific commands.** Fix commands are filled with the deployment, namespace, image, host, port, user, database, env var or package found in the log. Anything not found stays as `<placeholder>` and is flagged before running.
-6. **Fallback.** If Groq is unreachable or no key is set, the rule engine produces the full report and the page says which engine was used.
+6. **Fallback.** If no key is set, Groq fails, or the model's answer does not fit the required format, the rule engine produces the full report and the page says which engine was used and why. Rate limits are retried when Groq asks for a short wait. Tool arguments such as `L12` are accepted, and wrongly typed fields in the answer are coerced or dropped.
 
 ## 5. Safe-fix validator
 
