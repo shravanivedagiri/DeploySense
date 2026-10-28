@@ -1,0 +1,13 @@
+2026-10-01T09:00:02.917Z INFO [kubelet] Successfully pulled image in 2.1s
+2026-10-01T09:00:04.132Z INFO [kubelet] Pulling image "registry.example.com/team/quote-engine:1.4.13"
+2026-10-01T09:00:06.064Z INFO [app] Cache warmup complete
+2026-10-01T09:00:08.225Z INFO [kubelet] Started container quote-engine
+2026-10-01T09:00:10.489Z INFO [quote-engine] Starting quote-engine
+2026-10-01T09:00:13.875Z INFO [app] GET /health 200
+2026-10-01T09:00:15.913Z INFO [quote-engine] Loading configuration
+2026-10-01T09:00:18.072Z WARN [quote-engine] heap used 498MB of 512MB
+2026-10-01T09:00:22.008Z ERROR [quote-engine] FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+2026-10-01T09:00:23.102Z WARN [kubelet] Container quote-engine in pod quote-engine-f903ce86bf-0902e was OOMKilled (exit code 137)
+2026-10-01T09:00:26.045Z WARN [kubelet] Readiness probe failed: HTTP probe failed with statuscode: 503
+2026-10-01T09:00:28.268Z WARN [kubelet] Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e
+2026-10-01T09:00:31.938Z ERROR [kubelet] Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff

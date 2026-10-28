@@ -1,0 +1,11 @@
+INFO: Cache warmup complete
+INFO: Cache warmup complete
+INFO: Pulling image "registry.example.com/team/ledger:1.4.3"
+INFO: Started container ledger
+DEBUG: gc cycle finished
+INFO: Starting ledger
+INFO: Loading configuration
+INFO: HTTP server listening on port 8080
+ERROR: query failed: relation "order_refunds" does not exist
+ERROR: GET /orders/refunds 500
+ERROR: 502 Bad Gateway: no healthy upstream for ledger.example.com

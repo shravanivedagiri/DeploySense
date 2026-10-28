@@ -1,0 +1,12 @@
+INFO: Pulling image "registry.example.com/team/ledger:1.3.17"
+INFO: Started container ledger
+INFO: Successfully pulled image in 2.1s
+INFO: Starting ledger
+INFO: Successfully pulled image in 2.1s
+INFO: Loading configuration
+WARN: heap used 498MB of 512MB
+ERROR: FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+WARN: Container ledger in pod ledger-0e271365a6-7f5c0 was OOMKilled (exit code 137)
+WARN: Readiness probe failed: HTTP probe failed with statuscode: 503
+WARN: Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+ERROR: Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff

@@ -1,0 +1,831 @@
+[
+  {
+    "id": "container_oom_killed",
+    "plugin": "docker",
+    "title": "Container killed for exceeding its memory limit",
+    "patterns": [
+      "OOMKilled",
+      "exit code:? 137",
+      "exited with code 137",
+      "Out of memory: Killed process",
+      "memory limit exceeded",
+      "JavaScript heap out of memory",
+      "java\\.lang\\.OutOfMemoryError"
+    ],
+    "cause": "The container used more memory than its limit allows, so the kernel killed it (exit code 137).",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "container",
+    "fixes": [
+      {
+        "title": "Check the current memory limit and actual usage",
+        "command": "kubectl describe pod -l app={deployment} -n {namespace} | grep -A3 -i limits && kubectl top pod -l app={deployment} -n {namespace}",
+        "verify": "Compare the limit with the usage shown by kubectl top."
+      },
+      {
+        "title": "Raise the memory limit for the deployment",
+        "command": "kubectl set resources deployment/{deployment} -n {namespace} --limits=memory=1Gi --requests=memory=512Mi",
+        "verify": "kubectl rollout status deployment/{deployment} -n {namespace}"
+      },
+      {
+        "title": "For Node.js, cap the heap below the container limit",
+        "command": "kubectl set env deployment/{deployment} -n {namespace} NODE_OPTIONS=--max-old-space-size=768",
+        "verify": "kubectl get pods -l app={deployment} -n {namespace} -w  (pods stay Running, restart count stops increasing)"
+      }
+    ],
+    "prevention": "Set memory requests and limits from measured usage plus headroom, and alert on usage above 80 percent of the limit."
+  },
+  {
+    "id": "image_pull_not_found",
+    "plugin": "docker",
+    "title": "Image or tag does not exist in the registry",
+    "patterns": [
+      "manifest (?:for \\S+ )?unknown",
+      "(?:failed to pull|pulling) image \"(?P<image>[^\"]+)\".*(?:not found|manifest unknown)",
+      "repository (?P<image>\\S+) not found",
+      "no such manifest"
+    ],
+    "cause": "The deployment references an image name or tag that the registry cannot find, usually a typo or a tag that was never pushed.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "registry",
+    "fixes": [
+      {
+        "title": "Confirm which image the pod is trying to pull",
+        "command": "kubectl get deployment {deployment} -n {namespace} -o jsonpath='{.spec.template.spec.containers[*].image}'",
+        "verify": "The printed image and tag should match what CI pushed."
+      },
+      {
+        "title": "Check that the tag exists in the registry",
+        "command": "docker manifest inspect {image}",
+        "verify": "The command prints a manifest instead of 'no such manifest'."
+      },
+      {
+        "title": "Point the deployment at a tag that exists in the registry",
+        "command": "kubectl set image deployment/{deployment} <container-name>=<repository>:<existing-tag> -n {namespace}",
+        "verify": "kubectl rollout status deployment/{deployment} -n {namespace}"
+      }
+    ],
+    "prevention": "Deploy by immutable digest or the exact tag produced by the CI run, never a hand-typed tag."
+  },
+  {
+    "id": "image_pull_backoff",
+    "plugin": "docker",
+    "title": "Kubernetes cannot pull the container image",
+    "patterns": [
+      "ErrImagePull",
+      "ImagePullBackOff",
+      "Back-off pulling image"
+    ],
+    "cause": "Kubernetes keeps failing to pull the image and is backing off. This is a symptom; the line before it says whether the tag is missing or the registry rejected the credentials.",
+    "symptom": true,
+    "severity": "blocked",
+    "component": "registry",
+    "fixes": [
+      {
+        "title": "Read the exact pull error for the pod",
+        "command": "kubectl describe pod -l app={deployment} -n {namespace} | grep -A3 -i 'failed to pull'",
+        "verify": "The message says not found (wrong tag) or unauthorized (credentials)."
+      }
+    ],
+    "prevention": "Deploy by the exact image digest CI produced, from a registry the cluster has credentials for."
+  },
+  {
+    "id": "registry_auth_failed",
+    "plugin": "docker",
+    "title": "Registry rejected the credentials",
+    "patterns": [
+      "pull access denied for (?P<image>[^,\\s]+)",
+      "unauthorized: authentication required",
+      "denied: requested access to the resource is denied",
+      "no basic auth credentials",
+      "401 Unauthorized.*registry"
+    ],
+    "cause": "The cluster or build runner has no valid credentials for a private registry, or the token has expired.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "registry",
+    "fixes": [
+      {
+        "title": "Check which pull secret the pod uses",
+        "command": "kubectl get deployment {deployment} -n {namespace} -o jsonpath='{.spec.template.spec.imagePullSecrets}'",
+        "verify": "A secret name is listed and exists: kubectl get secret <name> -n {namespace}"
+      },
+      {
+        "title": "Recreate the registry pull secret",
+        "command": "kubectl create secret docker-registry regcred -n {namespace} --docker-server=<registry> --docker-username=<user> --docker-password=<token>",
+        "verify": "kubectl get secret regcred -n {namespace}"
+      },
+      {
+        "title": "Attach the secret to the deployment",
+        "command": "kubectl patch deployment {deployment} -n {namespace} -p '{\"spec\":{\"template\":{\"spec\":{\"imagePullSecrets\":[{\"name\":\"regcred\"}]}}}}'",
+        "verify": "kubectl rollout status deployment/{deployment} -n {namespace}"
+      }
+    ],
+    "prevention": "Use a robot or service account token for the registry and track its expiry date."
+  },
+  {
+    "id": "npm_dependency_conflict",
+    "plugin": "docker",
+    "title": "npm could not resolve dependency versions",
+    "patterns": [
+      "npm ERR! code ERESOLVE",
+      "ERESOLVE unable to resolve dependency tree",
+      "npm ERR! peer dep",
+      "Could not resolve dependency"
+    ],
+    "cause": "Two packages require incompatible versions of a shared dependency, so npm install stops during the build.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "build",
+    "fixes": [
+      {
+        "title": "Reproduce the conflict locally to see which packages clash",
+        "command": "npm ls --all 2>&1 | grep -i -B2 -A2 'invalid\\|unmet'",
+        "verify": "The output names the conflicting package versions."
+      },
+      {
+        "title": "Use the lockfile in CI instead of resolving fresh",
+        "command": "npm ci",
+        "verify": "npm ci exits with code 0."
+      },
+      {
+        "title": "Align the conflicting versions in package.json, then regenerate the lockfile",
+        "command": "npm install && git add package-lock.json",
+        "verify": "docker build . completes without npm ERR! lines."
+      }
+    ],
+    "prevention": "Commit package-lock.json and run npm ci in the Dockerfile."
+  },
+  {
+    "id": "native_module_build_failed",
+    "plugin": "docker",
+    "title": "Native Node module failed to compile",
+    "patterns": [
+      "Pre-built binaries not found for (?P<package>[\\w@/.-]+?)@\\d",
+      "gyp ERR!",
+      "node-gyp rebuild",
+      "prebuild-install warn",
+      "(?P<package>bcrypt|sharp|node-sass|canvas|sqlite3)@\\S+ install"
+    ],
+    "cause": "A package with native code has no prebuilt binary for this Node version or base image and the image lacks build tools, often after a Node version change.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "build",
+    "fixes": [
+      {
+        "title": "Check which Node version the base image uses",
+        "command": "docker run --rm <base-image> node --version",
+        "verify": "Compare with the version used by the last successful build."
+      },
+      {
+        "title": "Pin the base image to the Node version that last worked",
+        "command": "sed -i 's#^FROM node:.*#FROM node:18-bullseye#' Dockerfile",
+        "verify": "docker build . completes without gyp ERR! lines."
+      },
+      {
+        "title": "Or upgrade the native package to a version with prebuilt binaries",
+        "command": "npm install {package}@latest",
+        "verify": "npm ls {package} shows the new version and the build passes."
+      }
+    ],
+    "prevention": "Pin the base image tag (node:18.20-bullseye rather than node:latest)."
+  },
+  {
+    "id": "pip_no_matching_distribution",
+    "plugin": "docker",
+    "title": "pip could not find a matching package version",
+    "patterns": [
+      "No matching distribution found for (?P<package>\\S+)",
+      "Could not find a version that satisfies the requirement (?P<package>\\S+)",
+      "ResolutionImpossible"
+    ],
+    "cause": "A pinned Python package version does not exist for this Python version or platform, or the version constraints conflict.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "build",
+    "fixes": [
+      {
+        "title": "List the versions available for this Python version",
+        "command": "pip index versions {package}",
+        "verify": "The pinned version appears in the list."
+      },
+      {
+        "title": "Check the Python version in the image",
+        "command": "docker run --rm <image> python --version",
+        "verify": "The package supports this Python version."
+      },
+      {
+        "title": "Update the pin in requirements.txt and rebuild",
+        "command": "pip install --dry-run -r requirements.txt",
+        "verify": "The dry run resolves without errors."
+      }
+    ],
+    "prevention": "Generate pins with pip-compile against the same Python version as the image."
+  },
+  {
+    "id": "dockerfile_copy_missing",
+    "plugin": "docker",
+    "title": "Dockerfile COPY source file is missing",
+    "patterns": [
+      "COPY failed: (?:file not found|stat|no source files).*?(?P<path>[\\w./-]+)?",
+      "failed to compute cache key: .*\"?(?P<path>/[\\w./-]+)\"?: not found",
+      "failed to calculate checksum of ref .*\"(?P<path>[^\"]+)\": not found"
+    ],
+    "cause": "A file referenced by COPY or ADD is not in the build context, usually because of .dockerignore or a wrong relative path.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "build",
+    "fixes": [
+      {
+        "title": "Confirm the file exists relative to the build context",
+        "command": "ls -la .{path}",
+        "verify": "The file is listed."
+      },
+      {
+        "title": "Check whether .dockerignore excludes it",
+        "command": "grep -n . .dockerignore",
+        "verify": "No pattern matches the missing path."
+      },
+      {
+        "title": "Fix the COPY path in the Dockerfile and rebuild",
+        "command": "docker build --no-cache -t <image>:test .",
+        "verify": "The build passes the COPY step."
+      }
+    ],
+    "prevention": "Run docker build in CI on every pull request, not only on deploy."
+  },
+  {
+    "id": "port_already_in_use",
+    "plugin": "docker",
+    "title": "Port is already in use",
+    "patterns": [
+      "EADDRINUSE.*?:(?P<port>\\d{2,5})",
+      "address already in use(?:.*?:(?P<port>\\d{2,5}))?",
+      "port is already allocated",
+      "bind: address already in use",
+      "Bind for [^:]+:(?P<port>\\d{2,5}) failed"
+    ],
+    "cause": "Another process or container is already listening on the port the application tries to bind.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "container",
+    "fixes": [
+      {
+        "title": "Find what is listening on the port",
+        "command": "lsof -i :{port}",
+        "verify": "The output shows the conflicting process or container."
+      },
+      {
+        "title": "List containers publishing the port",
+        "command": "docker ps --filter publish={port}",
+        "verify": "An old container holding the port appears in the list."
+      },
+      {
+        "title": "Stop the old container",
+        "command": "docker stop <container-id>",
+        "verify": "lsof -i :{port} returns nothing, then restart the new container."
+      }
+    ],
+    "prevention": "Stop the previous release before starting the new one, or let the orchestrator manage ports."
+  },
+  {
+    "id": "no_space_left",
+    "plugin": "docker",
+    "title": "Disk is full on the build or node host",
+    "patterns": [
+      "no space left on device",
+      "ENOSPC",
+      "disk quota exceeded",
+      "DiskPressure"
+    ],
+    "cause": "The host has no free disk space, usually from accumulated images, build cache or logs.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "container",
+    "fixes": [
+      {
+        "title": "Check disk usage on the host",
+        "command": "df -h && docker system df",
+        "verify": "Identify which filesystem is full."
+      },
+      {
+        "title": "Remove dangling build cache only",
+        "command": "docker builder prune --filter until=72h",
+        "verify": "docker system df shows reclaimed space."
+      }
+    ],
+    "prevention": "Schedule build cache cleanup on runners and alert on disk above 85 percent."
+  },
+  {
+    "id": "container_nonzero_exit",
+    "plugin": "docker",
+    "title": "Build or container command exited with an error",
+    "patterns": [
+      "returned a non-zero code: (?P<code>\\d+)",
+      "did not complete successfully: exit code: (?P<code>\\d+)",
+      "exited with code (?P<code>[1-9]\\d*)",
+      "script returned exit code (?P<code>[1-9]\\d*)"
+    ],
+    "cause": "A command in the build or container stopped with a non-zero exit code. The real reason is in the lines just before this one.",
+    "symptom": true,
+    "severity": "blocked",
+    "component": "build",
+    "fixes": [
+      {
+        "title": "Show the full output of the failing step",
+        "command": "docker build --progress=plain --no-cache . 2>&1 | tail -n 80",
+        "verify": "The first error above the exit code names the real cause."
+      }
+    ],
+    "prevention": "Fail fast in scripts with set -euo pipefail so the first error is the one reported."
+  },
+  {
+    "id": "crashloop_backoff",
+    "plugin": "general",
+    "title": "Pod is restarting in a crash loop",
+    "patterns": [
+      "CrashLoopBackOff",
+      "Back-off restarting failed container"
+    ],
+    "cause": "The container starts and exits repeatedly. This is a symptom; the cause is in the container's own logs before it exits.",
+    "symptom": true,
+    "severity": "blocked",
+    "component": "container",
+    "fixes": [
+      {
+        "title": "Read the logs of the previous crashed container",
+        "command": "kubectl logs deployment/{deployment} -n {namespace} --previous --tail=100",
+        "verify": "The last lines before exit show the real error."
+      },
+      {
+        "title": "Check the exit reason and code",
+        "command": "kubectl describe pod -l app={deployment} -n {namespace} | grep -A5 'Last State'",
+        "verify": "Reason shows OOMKilled, Error, or Completed with an exit code."
+      }
+    ],
+    "prevention": "Make startup errors log clearly before the process exits."
+  },
+  {
+    "id": "probe_failed",
+    "plugin": "general",
+    "title": "Health check probe failing",
+    "patterns": [
+      "Readiness probe failed",
+      "Liveness probe failed",
+      "Startup probe failed",
+      "health ?check failed",
+      "unhealthy"
+    ],
+    "cause": "The app is not answering its health endpoint in time. Either the app is failing to start, or the probe path, port or timing is wrong.",
+    "symptom": true,
+    "severity": "degraded",
+    "component": "container",
+    "fixes": [
+      {
+        "title": "Check the probe configuration",
+        "command": "kubectl get deployment {deployment} -n {namespace} -o jsonpath='{.spec.template.spec.containers[0].readinessProbe}'",
+        "verify": "Path and port match what the app actually serves."
+      },
+      {
+        "title": "Call the health endpoint from inside the pod",
+        "command": "kubectl exec deploy/{deployment} -n {namespace} -- wget -qO- http://localhost:{port}/health",
+        "verify": "The endpoint returns 200."
+      },
+      {
+        "title": "Give slow-starting apps more time",
+        "command": "kubectl patch deployment {deployment} -n {namespace} --type=json -p='[{\"op\":\"replace\",\"path\":\"/spec/template/spec/containers/0/readinessProbe/initialDelaySeconds\",\"value\":30}]'",
+        "verify": "kubectl rollout status deployment/{deployment} -n {namespace}"
+      }
+    ],
+    "prevention": "Use a startup probe for apps with slow initialization."
+  },
+  {
+    "id": "upstream_unavailable",
+    "plugin": "general",
+    "title": "Load balancer has no healthy backend",
+    "patterns": [
+      "502 Bad Gateway",
+      "503 Service (?:Temporarily )?Unavailable",
+      "no healthy upstream",
+      "upstream connect error",
+      "connect\\(\\) failed .* while connecting to upstream",
+      "Target\\.FailedHealthChecks"
+    ],
+    "cause": "Traffic reaches the load balancer but no backend pod is ready to serve it. This is a downstream symptom of the app failing.",
+    "symptom": true,
+    "severity": "degraded",
+    "component": "load-balancer",
+    "fixes": [
+      {
+        "title": "Check whether the service has ready endpoints",
+        "command": "kubectl get endpoints {deployment} -n {namespace}",
+        "verify": "At least one pod IP is listed."
+      }
+    ],
+    "prevention": "Use rolling updates with maxUnavailable 0 so old pods keep serving until new ones are ready."
+  },
+  {
+    "id": "env_var_missing",
+    "plugin": "general",
+    "title": "Required environment variable is missing",
+    "patterns": [
+      "(?:environment variable|env var(?:iable)?)\\s+\"?'?(?P<env_var>[A-Z][A-Z0-9_]{2,})\"?'?\\s+(?:is )?(?:not set|missing|undefined|required)",
+      "Missing required (?:env(?:ironment)? )?(?:variable|config)[:\\s]+\"?(?P<env_var>[A-Z][A-Z0-9_]{2,})",
+      "KeyError: '(?P<env_var>[A-Z][A-Z0-9_]{2,})'",
+      "(?P<env_var>[A-Z][A-Z0-9_]{2,}) (?:is not defined|must be set|is required)"
+    ],
+    "cause": "The application needs an environment variable that the deployment does not provide, often a secret or config value missing in this environment.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "config",
+    "fixes": [
+      {
+        "title": "List the environment variables the deployment sets",
+        "command": "kubectl set env deployment/{deployment} -n {namespace} --list | grep -i {env_var}",
+        "verify": "If nothing prints, the variable is missing."
+      },
+      {
+        "title": "Check whether the referenced secret or config map has the key",
+        "command": "kubectl get secret,configmap -n {namespace} -o name",
+        "verify": "Find the object that should contain {env_var}."
+      },
+      {
+        "title": "Add the variable from a secret",
+        "command": "kubectl set env deployment/{deployment} -n {namespace} --from=secret/<secret-name> --keys={env_var}",
+        "verify": "kubectl rollout status deployment/{deployment} -n {namespace}"
+      }
+    ],
+    "prevention": "Validate required configuration at startup and keep a checked-in .env.example listing every key."
+  },
+  {
+    "id": "config_parse_error",
+    "plugin": "general",
+    "title": "Configuration file could not be parsed",
+    "patterns": [
+      "YAMLException",
+      "yaml: line (?P<line>\\d+)",
+      "error converting YAML to JSON",
+      "error parsing (?P<path>\\S+)",
+      "JSON\\.parse|Unexpected token .* in JSON",
+      "invalid character .* looking for beginning"
+    ],
+    "cause": "A YAML or JSON configuration file has a syntax error, often an indentation mistake or unquoted special character.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "config",
+    "fixes": [
+      {
+        "title": "Validate Kubernetes manifests without applying them",
+        "command": "kubectl apply --dry-run=client -f <manifest>.yaml",
+        "verify": "The command reports no parse errors."
+      },
+      {
+        "title": "Lint the YAML file",
+        "command": "yamllint <file>.yaml",
+        "verify": "No errors are reported at the reported line."
+      }
+    ],
+    "prevention": "Run yamllint and kubectl --dry-run in CI before deploy."
+  },
+  {
+    "id": "permission_denied",
+    "plugin": "general",
+    "title": "Permission denied on a file or socket",
+    "patterns": [
+      "EACCES",
+      "permission denied(?:.*?(?P<path>/[\\w./-]+))?",
+      "Operation not permitted",
+      "forbidden: User \"[^\"]+\" cannot"
+    ],
+    "cause": "The process runs as a user that lacks access to a file, directory, port or API resource.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "container",
+    "fixes": [
+      {
+        "title": "Check which user the container runs as and the file owner",
+        "command": "kubectl exec deploy/{deployment} -n {namespace} -- sh -c 'id; ls -la {path}'",
+        "verify": "The user owns or can read the path."
+      },
+      {
+        "title": "For Kubernetes RBAC errors, check what the service account may do",
+        "command": "kubectl auth can-i --list --as=system:serviceaccount:{namespace}:default -n {namespace}",
+        "verify": "The required verb and resource are listed."
+      }
+    ],
+    "prevention": "Set file ownership in the Dockerfile with COPY --chown and run as a fixed non-root UID."
+  },
+  {
+    "id": "tls_certificate_error",
+    "plugin": "general",
+    "title": "TLS certificate is invalid or expired",
+    "patterns": [
+      "x509: certificate",
+      "certificate has expired",
+      "self[- ]signed certificate",
+      "unable to verify the first certificate",
+      "CERT_HAS_EXPIRED",
+      "SSL: CERTIFICATE_VERIFY_FAILED"
+    ],
+    "cause": "A TLS connection failed certificate verification because the certificate is expired, self-signed, or for a different hostname.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "app",
+    "fixes": [
+      {
+        "title": "Inspect the certificate the server presents",
+        "command": "openssl s_client -connect {host}:443 -servername {host} </dev/null 2>/dev/null | openssl x509 -noout -dates -subject",
+        "verify": "notAfter is in the future and the subject matches the host."
+      }
+    ],
+    "prevention": "Automate renewal with cert-manager and alert 14 days before expiry."
+  },
+  {
+    "id": "insufficient_cluster_resources",
+    "plugin": "general",
+    "title": "No node has enough resources to schedule the pod",
+    "patterns": [
+      "0/\\d+ nodes are available",
+      "Insufficient (?:cpu|memory)",
+      "FailedScheduling"
+    ],
+    "cause": "The pod's resource requests are larger than the free capacity on every node, so it stays Pending.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "orchestrator",
+    "fixes": [
+      {
+        "title": "See free capacity per node",
+        "command": "kubectl describe nodes | grep -A6 'Allocated resources'",
+        "verify": "Compare free capacity with the pod requests."
+      },
+      {
+        "title": "Lower the requests if they are oversized",
+        "command": "kubectl set resources deployment/{deployment} -n {namespace} --requests=cpu=250m,memory=256Mi",
+        "verify": "kubectl get pods -n {namespace} shows the pod moving out of Pending."
+      }
+    ],
+    "prevention": "Set requests from measured usage and enable the cluster autoscaler."
+  },
+  {
+    "id": "dns_resolution_failed",
+    "plugin": "general",
+    "title": "Hostname could not be resolved",
+    "patterns": [
+      "getaddrinfo (?:ENOTFOUND|EAI_AGAIN) (?P<host>[\\w.-]+)",
+      "Name or service not known",
+      "no such host",
+      "Temporary failure in name resolution",
+      "could not resolve host:? (?P<host>[\\w.-]+)"
+    ],
+    "cause": "The application tries to reach a hostname that DNS cannot resolve, usually a wrong service name or a missing service in this namespace.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "app",
+    "fixes": [
+      {
+        "title": "Resolve the name from inside the cluster",
+        "command": "kubectl run dns-test --rm -it --image=busybox:1.36 -n {namespace} --restart=Never -- nslookup {host}",
+        "verify": "The name resolves to an address."
+      },
+      {
+        "title": "List services in the namespace to find the correct name",
+        "command": "kubectl get svc -n {namespace}",
+        "verify": "The intended service exists under the name the app uses."
+      }
+    ],
+    "prevention": "Use the fully qualified service name (service.namespace.svc.cluster.local) in configuration."
+  },
+  {
+    "id": "ci_tests_failed",
+    "plugin": "general",
+    "title": "Test suite failed in the pipeline",
+    "patterns": [
+      "Tests?:\\s+\\d+ failed",
+      "\\b\\d+ tests? failed",
+      "\\b\\d+ failed, \\d+ passed",
+      "FAILED (?P<path>\\S+::\\S+)",
+      "Test Suites?: \\d+ failed",
+      "AssertionError"
+    ],
+    "cause": "One or more automated tests failed, so the pipeline stopped before deploying.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "pipeline",
+    "fixes": [
+      {
+        "title": "Run the failing test locally",
+        "command": "pytest {path} -x -vv",
+        "verify": "The test fails locally with the same assertion, then passes after the fix."
+      }
+    ],
+    "prevention": "Run tests on pull requests so failures are caught before merge."
+  },
+  {
+    "id": "db_connection_refused",
+    "plugin": "database",
+    "title": "Database refused the connection",
+    "patterns": [
+      "ECONNREFUSED [^\\s:]*:(?P<port>5432|3306|27017|6379|1433)",
+      "connection refused.*?(?P<port>5432|3306|27017|6379|1433)",
+      "could not connect to server: Connection refused",
+      "Can't connect to MySQL server",
+      "Connection to (?P<host>[\\w.\\-\\[\\]]+):(?P<port>\\d+) refused",
+      "MongoNetworkError: connect ECONNREFUSED"
+    ],
+    "cause": "Nothing is accepting connections at the database host and port the app uses: the database is down, not yet ready, or the host or port in the configuration is wrong.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "database",
+    "fixes": [
+      {
+        "title": "Check that the database pod or service is running",
+        "command": "kubectl get pods,svc -n {namespace} | grep -i -E 'postgres|mysql|mongo|redis|db'",
+        "verify": "The database pod is Running and the service exists."
+      },
+      {
+        "title": "Test the port from the app's network",
+        "command": "kubectl run nettest --rm -it --image=busybox:1.36 -n {namespace} --restart=Never -- nc -zv {host} {port}",
+        "verify": "nc reports the port open."
+      },
+      {
+        "title": "Check the host and port the app is configured with",
+        "command": "kubectl set env deployment/{deployment} -n {namespace} --list | grep -i -E 'DB_|DATABASE|HOST|PORT'",
+        "verify": "The values match the database service name and port."
+      }
+    ],
+    "prevention": "Add an init container or retry with backoff so the app waits for the database instead of crashing."
+  },
+  {
+    "id": "db_auth_failed",
+    "plugin": "database",
+    "title": "Database rejected the username or password",
+    "patterns": [
+      "password authentication failed for user \"?(?P<user>[\\w-]+)\"?",
+      "Access denied for user '(?P<user>[\\w-]+)'",
+      "Authentication failed\\.?.*(?:mongo|SCRAM)",
+      "FATAL:\\s+role \"(?P<user>[\\w-]+)\" does not exist"
+    ],
+    "cause": "The database credentials the app uses do not match a valid user, often because a secret was rotated or differs between environments.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "database",
+    "fixes": [
+      {
+        "title": "Check which secret supplies the database password",
+        "command": "kubectl get deployment {deployment} -n {namespace} -o yaml | grep -B2 -A4 -i secretKeyRef",
+        "verify": "Note the secret name and key."
+      },
+      {
+        "title": "Test the credentials directly",
+        "command": "kubectl run psql-test --rm -it --image=postgres:16 -n {namespace} --restart=Never -- psql -h {host} -U {user} -d {db_name} -c 'select 1'",
+        "verify": "The query returns 1."
+      },
+      {
+        "title": "Restart the app after updating the secret so it reads the new value",
+        "command": "kubectl rollout restart deployment/{deployment} -n {namespace}",
+        "verify": "kubectl rollout status deployment/{deployment} -n {namespace}"
+      }
+    ],
+    "prevention": "Store credentials in one secret manager and sync to the cluster instead of editing secrets by hand."
+  },
+  {
+    "id": "db_database_missing",
+    "plugin": "database",
+    "title": "Database name does not exist",
+    "patterns": [
+      "database \"(?P<db_name>[\\w-]+)\" does not exist",
+      "Unknown database '(?P<db_name>[\\w-]+)'"
+    ],
+    "cause": "The app connects to a database name that has not been created on this server.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "database",
+    "fixes": [
+      {
+        "title": "List the databases on the server",
+        "command": "psql -h {host} -U {user} -l",
+        "verify": "Check whether {db_name} is listed."
+      },
+      {
+        "title": "Create the database",
+        "command": "psql -h {host} -U {user} -c 'CREATE DATABASE {db_name};'",
+        "verify": "psql -h {host} -U {user} -d {db_name} -c 'select 1' returns 1."
+      }
+    ],
+    "prevention": "Create databases through migrations or infrastructure code, not by hand."
+  },
+  {
+    "id": "db_migration_missing",
+    "plugin": "database",
+    "title": "Schema migration has not been applied",
+    "patterns": [
+      "relation \"(?P<table>[\\w.]+)\" does not exist",
+      "Table '[\\w]+\\.(?P<table>\\w+)' doesn't exist",
+      "no such table: (?P<table>\\w+)",
+      "column \"(?P<column>\\w+)\" (?:of relation \"\\w+\" )?does not exist",
+      "pending migrations?",
+      "Migrations are pending"
+    ],
+    "cause": "The new code expects a table or column that does not exist yet, because the database migration did not run before the app started.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "database",
+    "fixes": [
+      {
+        "title": "Check migration status",
+        "command": "kubectl exec deploy/{deployment} -n {namespace} -- npx prisma migrate status",
+        "verify": "The output lists the unapplied migration. Use your tool's equivalent: alembic current, rails db:migrate:status."
+      },
+      {
+        "title": "Apply pending migrations",
+        "command": "kubectl exec deploy/{deployment} -n {namespace} -- npx prisma migrate deploy",
+        "verify": "Migration status reports the database is up to date."
+      }
+    ],
+    "prevention": "Run migrations as a pre-deploy job or init container so the app never starts against an old schema."
+  },
+  {
+    "id": "db_timeout",
+    "plugin": "database",
+    "title": "Database connection timed out",
+    "patterns": [
+      "(?:connect|connection) (?:timed out|timeout).*?(?P<port>5432|3306|27017|6379)?",
+      "ETIMEDOUT.*?(?P<port>5432|3306|27017|6379)",
+      "timeout expired",
+      "SequelizeConnectionError: connect ETIMEDOUT",
+      "Connection is not available, request timed out",
+      "MongoServerSelectionError"
+    ],
+    "require_component": "database",
+    "cause": "The app can reach the network path but gets no answer in time, often a firewall or security group blocking the port, or a database under heavy load.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "database",
+    "fixes": [
+      {
+        "title": "Test reachability from the app's network",
+        "command": "kubectl run nettest --rm -it --image=busybox:1.36 -n {namespace} --restart=Never -- nc -zv -w 5 {host} {port}",
+        "verify": "nc connects within 5 seconds."
+      },
+      {
+        "title": "Check network policies in the namespace",
+        "command": "kubectl get networkpolicy -n {namespace}",
+        "verify": "No policy blocks egress from the app to the database port."
+      }
+    ],
+    "prevention": "Document required ports in the network policy alongside the deployment."
+  },
+  {
+    "id": "db_too_many_connections",
+    "plugin": "database",
+    "title": "Database connection limit reached",
+    "patterns": [
+      "too many connections",
+      "remaining connection slots are reserved",
+      "sorry, too many clients already",
+      "connection pool exhausted"
+    ],
+    "cause": "Every replica opens its own pool, and together they exceed the database max_connections, often after scaling up.",
+    "symptom": false,
+    "severity": "degraded",
+    "component": "database",
+    "fixes": [
+      {
+        "title": "Check the server limit and current usage",
+        "command": "psql -h {host} -U {user} -c 'show max_connections;' -c 'select count(*) from pg_stat_activity;'",
+        "verify": "Usage is close to the limit."
+      },
+      {
+        "title": "Reduce the pool size per replica",
+        "command": "kubectl set env deployment/{deployment} -n {namespace} DB_POOL_MAX=5",
+        "verify": "pg_stat_activity count drops below the limit."
+      }
+    ],
+    "prevention": "Size pools as max_connections divided by replica count, or use a pooler such as PgBouncer."
+  },
+  {
+    "id": "db_tls_required",
+    "plugin": "database",
+    "title": "Database requires an encrypted connection",
+    "patterns": [
+      "no pg_hba\\.conf entry for host .* (?:SSL off|no encryption)",
+      "SSL connection is required",
+      "server does not support SSL",
+      "requires secure transport"
+    ],
+    "cause": "The database only accepts TLS connections but the app connects without SSL, or the reverse.",
+    "symptom": false,
+    "severity": "blocked",
+    "component": "database",
+    "fixes": [
+      {
+        "title": "Enable SSL in the connection string",
+        "command": "kubectl set env deployment/{deployment} -n {namespace} PGSSLMODE=require",
+        "verify": "kubectl logs deployment/{deployment} -n {namespace} shows a successful connection."
+      }
+    ],
+    "prevention": "Keep sslmode explicit in every environment's connection string."
+  }
+]

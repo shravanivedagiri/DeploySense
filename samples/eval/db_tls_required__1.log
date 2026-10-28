@@ -1,0 +1,9 @@
+2026-10-01T09:00:02.772Z INFO [kubelet] Pulling image "registry.example.com/team/ledger:1.9.17"
+2026-10-01T09:00:06.691Z INFO [kubelet] Started container ledger
+2026-10-01T09:00:08.206Z INFO [ledger] Starting ledger
+2026-10-01T09:00:08.924Z INFO [ledger] Loading configuration
+2026-10-01T09:00:11.251Z INFO [kubelet] Successfully pulled image in 2.1s
+2026-10-01T09:00:13.576Z ERROR [ledger.db] FATAL: no pg_hba.conf entry for host "10.1.2.3", user "app", database "core", no encryption
+2026-10-01T09:00:14.192Z ERROR [ledger] Could not connect to postgres, exiting
+2026-10-01T09:00:14.359Z WARN [kubelet] Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+2026-10-01T09:00:14.497Z ERROR [kubelet] Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff

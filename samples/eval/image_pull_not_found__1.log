@@ -1,0 +1,7 @@
+INFO: Applying deployment "ledger" in namespace payments-dev
+INFO: Successfully pulled image in 2.1s
+INFO: GET /health 200
+WARN: Failed to pull image "ghcr.io/team/ledger:v3.0.0-rc": not found: manifest unknown
+WARN: Error: ErrImagePull
+WARN: Error: ImagePullBackOff
+ERROR: deployment "ledger" exceeded its progress deadline

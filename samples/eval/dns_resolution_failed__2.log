@@ -1,0 +1,11 @@
+{"time": "2026-10-01T09:00:02.896Z", "level": "info", "service": "kubelet", "msg": "Pulling image \"registry.example.com/team/quote-engine:1.4.17\""}
+{"time": "2026-10-01T09:00:03.857Z", "level": "info", "service": "kubelet", "msg": "Started container quote-engine"}
+{"time": "2026-10-01T09:00:04.877Z", "level": "info", "service": "quote-engine", "msg": "Starting quote-engine"}
+{"time": "2026-10-01T09:00:06.360Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:07.253Z", "level": "debug", "service": "app", "msg": "gc cycle finished"}
+{"time": "2026-10-01T09:00:10.742Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:14.434Z", "level": "info", "service": "quote-engine", "msg": "Loading configuration"}
+{"time": "2026-10-01T09:00:17.408Z", "level": "error", "service": "quote-engine", "msg": "Error: getaddrinfo ENOTFOUND inventory-svc.shop-staging"}
+{"time": "2026-10-01T09:00:20.473Z", "level": "error", "service": "quote-engine", "msg": "Failed to reach dependency, exiting"}
+{"time": "2026-10-01T09:00:23.157Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e"}
+{"time": "2026-10-01T09:00:23.809Z", "level": "error", "service": "kubelet", "msg": "Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff"}

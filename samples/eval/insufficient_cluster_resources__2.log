@@ -1,0 +1,4 @@
+{"time": "2026-10-01T09:00:03.908Z", "level": "info", "service": "deploy", "msg": "Applying deployment \"quote-engine\" in namespace shop-staging"}
+{"time": "2026-10-01T09:00:05.819Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:06.334Z", "level": "warn", "service": "default-scheduler", "msg": "FailedScheduling pod/quote-engine-f903ce86bf-0902e: 0/3 nodes are available: 3 Insufficient memory."}
+{"time": "2026-10-01T09:00:09.110Z", "level": "error", "service": "deploy", "msg": "deployment \"quote-engine\" exceeded its progress deadline"}

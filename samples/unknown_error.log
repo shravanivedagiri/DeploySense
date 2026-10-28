@@ -1,0 +1,6 @@
+2026-10-28T17:30:00.001Z INFO [scheduler-worker] Worker started, polling queue jobs.reports
+2026-10-28T17:30:05.220Z INFO [scheduler-worker] Picked job 88213 (monthly-report)
+2026-10-28T17:30:05.990Z ERROR [scheduler-worker] ReportRenderer: template "monthly_v4.tmpl" references field invoice.taxBreakdown which is absent in schema v3
+2026-10-28T17:30:06.001Z ERROR [scheduler-worker] Job 88213 failed, moving to dead letter queue
+2026-10-28T17:30:11.430Z ERROR [scheduler-worker] ReportRenderer: template "monthly_v4.tmpl" references field invoice.taxBreakdown which is absent in schema v3
+2026-10-28T17:30:11.431Z ERROR [scheduler-worker] Job 88214 failed, moving to dead letter queue

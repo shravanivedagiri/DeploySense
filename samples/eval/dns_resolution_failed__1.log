@@ -1,0 +1,11 @@
+2026-10-01T09:00:02.047Z INFO [app] GET /health 200
+2026-10-01T09:00:04.108Z INFO [kubelet] Pulling image "registry.example.com/team/ledger:1.8.1"
+2026-10-01T09:00:05.465Z INFO [kubelet] Started container ledger
+2026-10-01T09:00:05.896Z INFO [kubelet] Successfully pulled image in 2.1s
+2026-10-01T09:00:06.566Z INFO [kubelet] Successfully pulled image in 2.1s
+2026-10-01T09:00:07.064Z INFO [ledger] Starting ledger
+2026-10-01T09:00:10.214Z INFO [ledger] Loading configuration
+2026-10-01T09:00:11.697Z ERROR [ledger] Error: getaddrinfo ENOTFOUND inventory-svc.payments-dev
+2026-10-01T09:00:14.809Z ERROR [ledger] Failed to reach dependency, exiting
+2026-10-01T09:00:15.973Z WARN [kubelet] Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+2026-10-01T09:00:18.013Z ERROR [kubelet] Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff

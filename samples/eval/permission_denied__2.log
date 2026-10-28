@@ -1,0 +1,9 @@
+2026-10-01T09:00:03.922Z INFO [app] Cache warmup complete
+2026-10-01T09:00:04.450Z INFO [kubelet] Pulling image "registry.example.com/team/quote-engine:1.4.1"
+2026-10-01T09:00:05.191Z INFO [kubelet] Started container quote-engine
+2026-10-01T09:00:06.343Z INFO [quote-engine] Starting quote-engine
+2026-10-01T09:00:06.629Z INFO [quote-engine] Loading configuration
+2026-10-01T09:00:07.450Z ERROR [quote-engine] PermissionError: [Errno 13] Permission denied: '/var/cache/app'
+2026-10-01T09:00:08.356Z WARN [kubelet] Container quote-engine exited with code 1
+2026-10-01T09:00:12.254Z WARN [kubelet] Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e
+2026-10-01T09:00:13.611Z ERROR [kubelet] Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff

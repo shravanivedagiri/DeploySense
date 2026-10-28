@@ -1,0 +1,11 @@
+{"time": "2026-10-01T09:00:00.428Z", "level": "info", "service": "kubelet", "msg": "Pulling image \"registry.example.com/team/quote-engine:1.2.3\""}
+{"time": "2026-10-01T09:00:00.635Z", "level": "info", "service": "kubelet", "msg": "Started container quote-engine"}
+{"time": "2026-10-01T09:00:00.886Z", "level": "info", "service": "quote-engine", "msg": "Starting quote-engine"}
+{"time": "2026-10-01T09:00:01.511Z", "level": "info", "service": "quote-engine", "msg": "Loading configuration"}
+{"time": "2026-10-01T09:00:04.200Z", "level": "info", "service": "app", "msg": "GET /health 200"}
+{"time": "2026-10-01T09:00:05.757Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:06.266Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:07.888Z", "level": "error", "service": "quote-engine.db", "msg": "FATAL: no pg_hba.conf entry for host \"10.1.2.3\", user \"app\", database \"core\", no encryption"}
+{"time": "2026-10-01T09:00:11.391Z", "level": "error", "service": "quote-engine", "msg": "Could not connect to postgres, exiting"}
+{"time": "2026-10-01T09:00:13.319Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e"}
+{"time": "2026-10-01T09:00:15.686Z", "level": "error", "service": "kubelet", "msg": "Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff"}

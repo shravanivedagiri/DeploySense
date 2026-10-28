@@ -1,0 +1,4 @@
+DEBUG: gc cycle finished
+INFO: Step 7/9 : RUN npm run build
+ERROR: ENOSPC: no space left on device, write
+ERROR: The command '/bin/sh -c npm run build' returned a non-zero code: 1

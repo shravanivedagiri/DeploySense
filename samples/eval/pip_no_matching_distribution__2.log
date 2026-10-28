@@ -1,0 +1,5 @@
+INFO: Successfully pulled image in 2.1s
+INFO: Step 3/7 : RUN pip install -r requirements.txt
+ERROR: ERROR: Could not find a version that satisfies the requirement numpy==1.21.0 (from versions: 1.26.0, 1.26.4)
+ERROR: ERROR: No matching distribution found for numpy==1.21.0
+ERROR: The command '/bin/sh -c pip install -r requirements.txt' returned a non-zero code: 1

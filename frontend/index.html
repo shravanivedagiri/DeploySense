@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeploySense AI</title>
+  <meta name="description" content="Upload a failed deployment log and get the probable root cause, the log lines that support it, and fixes checked for risk.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="stylesheet" href="/css/styles.css">
+  <script type="importmap">
+    { "imports": { "three": "/vendor/three/three.module.min.js", "three/addons/": "/vendor/three/addons/" } }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="DeploySense AI home">
+      <img src="/favicon.svg" width="24" height="24" alt="">
+      <span>DeploySense</span>
+    </a>
+    <p class="engine" id="engine" aria-live="polite">Checking analysis engine</p>
+  </header>
+
+  <main id="main" class="workspace">
+    <section class="intake" aria-labelledby="intake-title">
+      <h1 id="intake-title">Find out why a deployment failed</h1>
+      <p class="lede">Upload the log from the failed run. DeploySense finds the probable root cause, shows the lines that support it, and checks every fix for risk before you run it.</p>
+
+      <form id="analyze-form" novalidate>
+        <div class="field">
+          <div class="field-head">
+            <label for="failed-log">Failed deployment log</label>
+            <label class="file-pick">
+              <input type="file" id="failed-file" accept=".log,.txt,.json,.jsonl,.out,text/plain">
+              <span><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Upload file</span>
+            </label>
+          </div>
+          <textarea id="failed-log" rows="9" spellcheck="false" placeholder="Paste output from kubectl logs, docker build, a CI job, or application logs"></textarea>
+          <p class="field-note" id="failed-note"></p>
+        </div>
+
+        <details class="field optional" id="success-block">
+          <summary>Compare with the last successful run <span class="muted">(optional)</span></summary>
+          <div class="field-head">
+            <label for="success-log">Successful deployment log</label>
+            <label class="file-pick">
+              <input type="file" id="success-file" accept=".log,.txt,.json,.jsonl,.out,text/plain">
+              <span><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>Upload file</span>
+            </label>
+          </div>
+          <textarea id="success-log" rows="5" spellcheck="false" placeholder="Same pipeline, last run that worked"></textarea>
+        </details>
+
+        <label class="check">
+          <input type="checkbox" id="use-llm" checked>
+          <span>Use AI reasoning <span class="muted" id="llm-note"></span></span>
+        </label>
+
+        <p class="form-error" id="form-error" role="alert"></p>
+        <button type="submit" class="btn btn-primary" id="analyze-btn">Analyze log</button>
+      </form>
+
+      <div class="samples">
+        <h2>Try a sample log</h2>
+        <ul id="sample-list"></ul>
+      </div>
+
+      <p class="privacy-note">Passwords, tokens, emails and IP addresses are masked before analysis. DeploySense never runs commands on your systems.</p>
+    </section>
+
+    <section class="case" id="case" aria-live="polite">
+      <div class="empty" id="empty">
+        <h2>No analysis yet</h2>
+        <p>Paste a log or pick a sample. You will get the probable root cause, the evidence lines, a replay of how the failure spread across your deployment, and fixes ordered from safe checks to changes.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>DeploySense AI</span>
+    <nav aria-label="Legal"><a href="/privacy">Privacy policy</a><a href="/terms">Terms and conditions</a></nav>
+  </footer>
+
+  <template id="report-tpl">
+    <article class="report">
+      <header class="verdict">
+        <div class="verdict-status"><span class="lamp" data-js="sev-lamp"></span><span data-js="severity"></span></div>
+        <h2 class="verdict-title" data-js="root-title"></h2>
+        <p class="verdict-expl" data-js="root-expl"></p>
+        <dl class="facts">
+          <div><dt>Confidence</dt><dd data-js="confidence"></dd></div>
+          <div><dt>Component</dt><dd data-js="component"></dd></div>
+          <div><dt>First seen</dt><dd data-js="first-seen"></dd></div>
+          <div><dt>Diagnosed by</dt><dd data-js="mode"></dd></div>
+        </dl>
+        <details class="reasons"><summary>Why this confidence</summary><ul data-js="reasons"></ul></details>
+        <p class="summary" data-js="summary"></p>
+        <p class="notice" data-js="notice" hidden></p>
+      </header>
+
+      <section class="panel map-panel" aria-labelledby="map-h">
+        <div class="panel-head">
+          <h3 id="map-h">How the failure spread</h3>
+          <div class="seg" role="group" aria-label="Map view">
+            <button type="button" class="seg-btn" data-view="3d" aria-pressed="true"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>3D</button>
+            <button type="button" class="seg-btn" data-view="2d" aria-pressed="false"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/></svg>2D</button>
+          </div>
+        </div>
+        <div class="map-stage" data-js="map-stage"></div>
+        <div class="replay">
+          <button type="button" class="btn btn-icon" data-js="play" aria-label="Replay the failure"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+          <input type="range" data-js="scrub" min="0" max="1000" value="0" aria-label="Time in the log">
+          <output data-js="clock">0s</output>
+        </div>
+        <ul class="legend" aria-label="Legend">
+          <li><span class="lamp" data-state="ok"></span>Healthy</li>
+          <li><span class="lamp" data-state="degraded"></span>Degraded, warnings</li>
+          <li><span class="lamp" data-state="failed"></span>Failed, errors</li>
+          <li><span class="ring"></span>Probable root cause</li>
+        </ul>
+        <div class="node-detail" data-js="node-detail"><p class="muted">Select a component to see its log lines.</p></div>
+      </section>
+
+      <div class="columns">
+        <section class="panel" aria-labelledby="ev-h">
+          <div class="panel-head"><h3 id="ev-h">Evidence</h3><button type="button" class="btn btn-quiet" data-js="full-log">Show full log</button></div>
+          <div class="logview" data-js="evidence"></div>
+        </section>
+        <section class="panel" aria-labelledby="fix-h">
+          <div class="panel-head"><h3 id="fix-h">Fix plan</h3><span class="muted" data-js="fix-count"></span></div>
+          <ol class="fixes" data-js="fixes"></ol>
+          <p class="prevention" data-js="prevention"></p>
+        </section>
+      </div>
+
+      <section class="panel" aria-labelledby="tl-h">
+        <div class="panel-head"><h3 id="tl-h">Timeline</h3><span class="muted" data-js="tl-source"></span></div>
+        <ol class="chain" data-js="links"></ol>
+        <ol class="timeline" data-js="timeline"></ol>
+      </section>
+
+      <section class="panel" data-js="diff-panel" hidden aria-labelledby="diff-h">
+        <div class="panel-head"><h3 id="diff-h">Compared with the successful run</h3></div>
+        <div data-js="diff"></div>
+      </section>
+
+      <section class="panel" aria-labelledby="trace-h">
+        <div class="panel-head"><h3 id="trace-h">What the agent did</h3><span class="muted" data-js="elapsed"></span></div>
+        <ol class="trace" data-js="trace"></ol>
+        <div data-js="other-findings"></div>
+      </section>
+
+      <section class="feedback" aria-labelledby="fb-h">
+        <h3 id="fb-h">Was this diagnosis useful?</h3>
+        <div class="feedback-actions">
+          <button type="button" class="btn" data-js="fb-yes"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/></svg>Useful</button>
+          <button type="button" class="btn" data-js="fb-no"><svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/></svg>Not useful</button>
+        </div>
+        <p class="muted" data-js="fb-result" aria-live="polite"></p>
+      </section>
+    </article>
+  </template>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

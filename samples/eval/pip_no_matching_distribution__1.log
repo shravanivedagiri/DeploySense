@@ -1,0 +1,6 @@
+{"time": "2026-10-01T09:00:01.535Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:02.303Z", "level": "info", "service": "build", "msg": "Step 3/7 : RUN pip install -r requirements.txt"}
+{"time": "2026-10-01T09:00:04.885Z", "level": "error", "service": "build", "msg": "ERROR: Could not find a version that satisfies the requirement numpy==1.21.0 (from versions: 1.26.0, 1.26.4)"}
+{"time": "2026-10-01T09:00:05.444Z", "level": "debug", "service": "app", "msg": "gc cycle finished"}
+{"time": "2026-10-01T09:00:07.546Z", "level": "error", "service": "build", "msg": "ERROR: No matching distribution found for numpy==1.21.0"}
+{"time": "2026-10-01T09:00:07.867Z", "level": "error", "service": "build", "msg": "The command '/bin/sh -c pip install -r requirements.txt' returned a non-zero code: 1"}

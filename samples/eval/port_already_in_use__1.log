@@ -1,0 +1,7 @@
+{"time": "2026-10-01T09:00:01.725Z", "level": "info", "service": "ledger", "msg": "Starting HTTP server"}
+{"time": "2026-10-01T09:00:04.055Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:05.273Z", "level": "info", "service": "app", "msg": "GET /health 200"}
+{"time": "2026-10-01T09:00:08.971Z", "level": "error", "service": "ledger", "msg": "Error: listen EADDRINUSE: address already in use :::3000"}
+{"time": "2026-10-01T09:00:09.611Z", "level": "warn", "service": "kubelet", "msg": "Container ledger exited with code 1"}
+{"time": "2026-10-01T09:00:13.046Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0"}
+{"time": "2026-10-01T09:00:14.889Z", "level": "error", "service": "kubelet", "msg": "Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff"}

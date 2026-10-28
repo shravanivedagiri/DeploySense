@@ -1,0 +1,9 @@
+INFO: Pulling image "registry.example.com/team/ledger:1.6.13"
+INFO: Successfully pulled image in 2.1s
+INFO: Started container ledger
+INFO: Starting ledger
+INFO: Loading configuration
+ERROR: FATAL: password authentication failed for user "app"
+ERROR: Could not connect to database, exiting
+WARN: Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+ERROR: Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff

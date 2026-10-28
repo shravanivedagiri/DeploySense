@@ -1,0 +1,42 @@
+#0 building with "default" instance using docker driver
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 512B done
+#1 DONE 0.0s
+#2 [internal] load metadata for docker.io/library/node:20-bullseye
+#2 DONE 1.2s
+#3 [1/6] FROM docker.io/library/node:20-bullseye@sha256:4f3c9a1b2d7e
+#3 DONE 0.0s
+#4 [internal] load build context
+#4 transferring context: 1.84MB 0.1s done
+#4 DONE 0.2s
+#5 [2/6] WORKDIR /usr/src/app
+#5 CACHED
+#6 [3/6] COPY package.json package-lock.json ./
+#6 DONE 0.1s
+#7 [4/6] RUN npm ci --omit=dev
+#7 2.114 npm WARN deprecated inflight@1.0.6: This module is not supported
+#7 9.802 npm ERR! code 1
+#7 9.803 npm ERR! path /usr/src/app/node_modules/bcrypt
+#7 9.803 npm ERR! command failed
+#7 9.804 npm ERR! command sh -c node-pre-gyp install --fallback-to-build
+#7 9.810 npm ERR! node-pre-gyp WARN Using request for node-pre-gyp https download
+#7 9.811 npm ERR! node-pre-gyp WARN Tried to download(404): https://github.com/kelektiv/node.bcrypt.js/releases/download/v5.0.1/bcrypt_lib-v5.0.1-napi-v3-linux-x64-glibc.tar.gz
+#7 9.812 npm ERR! node-pre-gyp WARN Pre-built binaries not found for bcrypt@5.0.1 and node@20.11.1 (node-v115 ABI, glibc) (falling back to source compile with node-gyp)
+#7 10.92 npm ERR! gyp ERR! find Python Python is not set from command line or npm configuration
+#7 10.93 npm ERR! gyp ERR! configure error
+#7 10.93 npm ERR! gyp ERR! stack Error: Could not find any Python installation to use
+#7 10.94 npm ERR! gyp ERR! node -v v20.11.1
+#7 10.94 npm ERR! gyp ERR! node-gyp -v v9.4.0
+#7 10.95 npm ERR! gyp ERR! not ok
+#7 ERROR: process "/bin/sh -c npm ci --omit=dev" did not complete successfully: exit code: 1
+------
+ > [4/6] RUN npm ci --omit=dev:
+9.804 npm ERR! command sh -c node-pre-gyp install --fallback-to-build
+10.95 npm ERR! gyp ERR! not ok
+------
+Dockerfile:5
+--------------------
+   3 |     COPY package.json package-lock.json ./
+   4 | >>> RUN npm ci --omit=dev
+--------------------
+ERROR: failed to solve: process "/bin/sh -c npm ci --omit=dev" did not complete successfully: exit code: 1

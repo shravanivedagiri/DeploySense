@@ -1,0 +1,11 @@
+{"time": "2026-10-01T09:00:02.038Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:05.759Z", "level": "info", "service": "kubelet", "msg": "Pulling image \"registry.example.com/team/ledger:1.7.3\""}
+{"time": "2026-10-01T09:00:06.570Z", "level": "info", "service": "kubelet", "msg": "Started container ledger"}
+{"time": "2026-10-01T09:00:08.427Z", "level": "info", "service": "app", "msg": "GET /health 200"}
+{"time": "2026-10-01T09:00:11.739Z", "level": "info", "service": "ledger", "msg": "Starting ledger"}
+{"time": "2026-10-01T09:00:14.423Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:15.864Z", "level": "info", "service": "ledger", "msg": "Loading configuration"}
+{"time": "2026-10-01T09:00:16.299Z", "level": "error", "service": "ledger.db", "msg": "connect ETIMEDOUT [IP]:5432 to postgres"}
+{"time": "2026-10-01T09:00:19.659Z", "level": "error", "service": "ledger", "msg": "Database unavailable, exiting"}
+{"time": "2026-10-01T09:00:23.614Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0"}
+{"time": "2026-10-01T09:00:26.650Z", "level": "error", "service": "kubelet", "msg": "Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff"}

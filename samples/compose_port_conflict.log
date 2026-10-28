@@ -1,0 +1,5 @@
+2026-10-28 15:05:11,220 INFO  [compose] Creating network "inventory_default" with the default driver
+2026-10-28 15:05:11,904 INFO  [compose] Creating inventory_redis_1 ... done
+2026-10-28 15:05:12,330 INFO  [compose] Creating inventory_api_1 ...
+2026-10-28 15:05:12,911 ERROR [compose] for inventory_api_1  Cannot start service api: driver failed programming external connectivity on endpoint inventory_api_1: Bind for [IP]:8000 failed: port is already allocated
+2026-10-28 15:05:12,914 ERROR [compose] Encountered errors while bringing up the project.

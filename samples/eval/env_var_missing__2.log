@@ -1,0 +1,12 @@
+{"time": "2026-10-01T09:00:00.446Z", "level": "info", "service": "kubelet", "msg": "Pulling image \"registry.example.com/team/quote-engine:1.6.16\""}
+{"time": "2026-10-01T09:00:01.669Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:01.984Z", "level": "info", "service": "kubelet", "msg": "Started container quote-engine"}
+{"time": "2026-10-01T09:00:05.339Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:08.237Z", "level": "info", "service": "quote-engine", "msg": "Starting quote-engine"}
+{"time": "2026-10-01T09:00:09.067Z", "level": "debug", "service": "app", "msg": "gc cycle finished"}
+{"time": "2026-10-01T09:00:10.889Z", "level": "info", "service": "quote-engine", "msg": "Loading configuration"}
+{"time": "2026-10-01T09:00:14.636Z", "level": "error", "service": "quote-engine", "msg": "Missing required environment variable: STRIPE_API_KEY"}
+{"time": "2026-10-01T09:00:15.012Z", "level": "warn", "service": "kubelet", "msg": "Container quote-engine exited with code 1"}
+{"time": "2026-10-01T09:00:16.193Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e"}
+{"time": "2026-10-01T09:00:20.116Z", "level": "error", "service": "kubelet", "msg": "Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff"}
+{"time": "2026-10-01T09:00:20.264Z", "level": "error", "service": "ingress-nginx", "msg": "502 Bad Gateway: no healthy upstream for quote-engine.example.com"}

@@ -1,0 +1,8 @@
+2026-10-01T09:00:03.185Z INFO [app] GET /health 200
+2026-10-01T09:00:05.428Z INFO [app] GET /health 200
+2026-10-01T09:00:06.728Z DEBUG [app] gc cycle finished
+2026-10-01T09:00:09.441Z INFO [ci] Run npm test
+2026-10-01T09:00:13.057Z ERROR [ci] FAIL src/cart/total.test.ts
+2026-10-01T09:00:13.509Z ERROR [ci] AssertionError: expected 118.5 to equal 120
+2026-10-01T09:00:16.440Z ERROR [ci] Tests: 2 failed, 148 passed, 150 total
+2026-10-01T09:00:19.982Z ERROR [ci] Process completed with exit code 1.

@@ -1,0 +1,3 @@
+INFO: Step 6/9 : COPY dist/ /app/dist/
+INFO: Cache warmup complete
+ERROR: COPY failed: file not found in build context or excluded by .dockerignore: stat dist/: file does not exist

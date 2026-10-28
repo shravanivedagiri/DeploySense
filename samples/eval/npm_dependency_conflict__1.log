@@ -1,0 +1,6 @@
+INFO: Step 4/8 : RUN npm install
+DEBUG: gc cycle finished
+INFO: Successfully pulled image in 2.1s
+ERROR: npm ERR! code ERESOLVE
+ERROR: npm ERR! ERESOLVE unable to resolve dependency tree
+ERROR: The command '/bin/sh -c npm install' returned a non-zero code: 1

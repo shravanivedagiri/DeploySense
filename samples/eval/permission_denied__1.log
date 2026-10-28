@@ -1,0 +1,10 @@
+INFO: Pulling image "registry.example.com/team/ledger:1.8.1"
+INFO: Started container ledger
+INFO: Starting ledger
+INFO: GET /health 200
+INFO: Successfully pulled image in 2.1s
+INFO: Loading configuration
+ERROR: Error: EACCES: permission denied, open '/app/logs/app.log'
+WARN: Container ledger exited with code 1
+WARN: Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+ERROR: Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff

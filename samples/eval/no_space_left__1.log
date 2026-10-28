@@ -1,0 +1,6 @@
+{"time": "2026-10-01T09:00:00.419Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:01.220Z", "level": "info", "service": "build", "msg": "Step 7/9 : RUN npm run build"}
+{"time": "2026-10-01T09:00:01.919Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:02.949Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:05.726Z", "level": "error", "service": "build", "msg": "ENOSPC: no space left on device, write"}
+{"time": "2026-10-01T09:00:06.761Z", "level": "error", "service": "build", "msg": "The command '/bin/sh -c npm run build' returned a non-zero code: 1"}

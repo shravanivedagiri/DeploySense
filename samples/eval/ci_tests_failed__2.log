@@ -1,0 +1,7 @@
+{"time": "2026-10-01T09:00:00.369Z", "level": "info", "service": "ci", "msg": "Run npm test"}
+{"time": "2026-10-01T09:00:03.010Z", "level": "info", "service": "app", "msg": "GET /health 200"}
+{"time": "2026-10-01T09:00:06.124Z", "level": "info", "service": "app", "msg": "GET /health 200"}
+{"time": "2026-10-01T09:00:09.807Z", "level": "error", "service": "ci", "msg": "FAIL src/cart/total.test.ts"}
+{"time": "2026-10-01T09:00:10.933Z", "level": "error", "service": "ci", "msg": "AssertionError: expected 118.5 to equal 120"}
+{"time": "2026-10-01T09:00:12.777Z", "level": "error", "service": "ci", "msg": "Tests: 2 failed, 148 passed, 150 total"}
+{"time": "2026-10-01T09:00:13.525Z", "level": "error", "service": "ci", "msg": "Process completed with exit code 1."}

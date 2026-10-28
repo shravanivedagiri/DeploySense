@@ -1,0 +1,10 @@
+2026-10-01T09:00:01.156Z INFO [kubelet] Pulling image "registry.example.com/team/ledger:1.3.13"
+2026-10-01T09:00:02.390Z INFO [kubelet] Started container ledger
+2026-10-01T09:00:02.486Z INFO [ledger] Starting ledger
+2026-10-01T09:00:03.162Z INFO [app] Cache warmup complete
+2026-10-01T09:00:04.958Z INFO [ledger] Loading configuration
+2026-10-01T09:00:07.227Z ERROR [ledger] KeyError: 'REDIS_URL'
+2026-10-01T09:00:08.819Z WARN [kubelet] Container ledger exited with code 1
+2026-10-01T09:00:11.396Z WARN [kubelet] Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+2026-10-01T09:00:13.795Z ERROR [kubelet] Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff
+2026-10-01T09:00:15.180Z ERROR [ingress-nginx] 502 Bad Gateway: no healthy upstream for ledger.example.com

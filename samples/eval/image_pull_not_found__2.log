@@ -1,0 +1,7 @@
+2026-10-01T09:00:01.786Z INFO [deploy] Applying deployment "quote-engine" in namespace shop-staging
+2026-10-01T09:00:02.364Z WARN [kubelet] Failed to pull image "ghcr.io/team/quote-engine:v2.0.0-rc": not found: manifest unknown
+2026-10-01T09:00:04.051Z INFO [app] Cache warmup complete
+2026-10-01T09:00:05.941Z INFO [app] Cache warmup complete
+2026-10-01T09:00:07.315Z WARN [kubelet] Error: ErrImagePull
+2026-10-01T09:00:07.692Z WARN [kubelet] Error: ImagePullBackOff
+2026-10-01T09:00:10.521Z ERROR [deploy] deployment "quote-engine" exceeded its progress deadline

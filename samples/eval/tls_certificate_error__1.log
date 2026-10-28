@@ -1,0 +1,10 @@
+2026-10-01T09:00:02.401Z INFO [app] GET /health 200
+2026-10-01T09:00:03.100Z INFO [kubelet] Pulling image "registry.example.com/team/ledger:1.5.20"
+2026-10-01T09:00:05.377Z INFO [kubelet] Started container ledger
+2026-10-01T09:00:05.872Z INFO [ledger] Starting ledger
+2026-10-01T09:00:09.838Z INFO [ledger] Loading configuration
+2026-10-01T09:00:11.407Z INFO [app] GET /health 200
+2026-10-01T09:00:14.000Z ERROR [ledger] Post "https://payments.partner.example/v1/charge": x509: certificate has expired or is not yet valid
+2026-10-01T09:00:14.184Z ERROR [ledger] Startup dependency check failed, exiting
+2026-10-01T09:00:14.552Z WARN [kubelet] Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+2026-10-01T09:00:18.213Z ERROR [kubelet] Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff

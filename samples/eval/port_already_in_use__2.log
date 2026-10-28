@@ -1,0 +1,8 @@
+INFO: GET /health 200
+INFO: Successfully pulled image in 2.1s
+INFO: Starting HTTP server
+DEBUG: gc cycle finished
+ERROR: Error: listen EADDRINUSE: address already in use :::3000
+WARN: Container quote-engine exited with code 1
+WARN: Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e
+ERROR: Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff

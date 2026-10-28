@@ -1,0 +1,9 @@
+2026-10-01T09:00:00.259Z INFO [kubelet] Pulling image "registry.example.com/team/quote-engine:1.5.6"
+2026-10-01T09:00:03.717Z DEBUG [app] gc cycle finished
+2026-10-01T09:00:07.218Z INFO [kubelet] Started container quote-engine
+2026-10-01T09:00:10.226Z INFO [quote-engine] Starting quote-engine
+2026-10-01T09:00:13.959Z INFO [app] Cache warmup complete
+2026-10-01T09:00:16.140Z INFO [quote-engine] Loading configuration
+2026-10-01T09:00:18.789Z INFO [quote-engine] Scaled to 12 replicas
+2026-10-01T09:00:20.627Z ERROR [quote-engine.db] FATAL: remaining connection slots are reserved for non-replication superuser connections
+2026-10-01T09:00:23.712Z ERROR [quote-engine] GET /search 500

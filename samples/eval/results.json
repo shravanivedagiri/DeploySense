@@ -1,0 +1,376 @@
+{
+ "mode": "rules",
+ "correct": 46,
+ "total": 46,
+ "accuracy": 1.0,
+ "rows": [
+  {
+   "file": "container_oom_killed__1.log",
+   "expected": "container_oom_killed",
+   "predicted": "container_oom_killed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "image_pull_not_found__1.log",
+   "expected": "image_pull_not_found",
+   "predicted": "image_pull_not_found",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "registry_auth_failed__1.log",
+   "expected": "registry_auth_failed",
+   "predicted": "registry_auth_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "npm_dependency_conflict__1.log",
+   "expected": "npm_dependency_conflict",
+   "predicted": "npm_dependency_conflict",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "native_module_build_failed__1.log",
+   "expected": "native_module_build_failed",
+   "predicted": "native_module_build_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "pip_no_matching_distribution__1.log",
+   "expected": "pip_no_matching_distribution",
+   "predicted": "pip_no_matching_distribution",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "dockerfile_copy_missing__1.log",
+   "expected": "dockerfile_copy_missing",
+   "predicted": "dockerfile_copy_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "port_already_in_use__1.log",
+   "expected": "port_already_in_use",
+   "predicted": "port_already_in_use",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "no_space_left__1.log",
+   "expected": "no_space_left",
+   "predicted": "no_space_left",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "env_var_missing__1.log",
+   "expected": "env_var_missing",
+   "predicted": "env_var_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "config_parse_error__1.log",
+   "expected": "config_parse_error",
+   "predicted": "config_parse_error",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "permission_denied__1.log",
+   "expected": "permission_denied",
+   "predicted": "permission_denied",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "tls_certificate_error__1.log",
+   "expected": "tls_certificate_error",
+   "predicted": "tls_certificate_error",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "insufficient_cluster_resources__1.log",
+   "expected": "insufficient_cluster_resources",
+   "predicted": "insufficient_cluster_resources",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "dns_resolution_failed__1.log",
+   "expected": "dns_resolution_failed",
+   "predicted": "dns_resolution_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "ci_tests_failed__1.log",
+   "expected": "ci_tests_failed",
+   "predicted": "ci_tests_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_connection_refused__1.log",
+   "expected": "db_connection_refused",
+   "predicted": "db_connection_refused",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_auth_failed__1.log",
+   "expected": "db_auth_failed",
+   "predicted": "db_auth_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_database_missing__1.log",
+   "expected": "db_database_missing",
+   "predicted": "db_database_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_migration_missing__1.log",
+   "expected": "db_migration_missing",
+   "predicted": "db_migration_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_timeout__1.log",
+   "expected": "db_timeout",
+   "predicted": "db_timeout",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_too_many_connections__1.log",
+   "expected": "db_too_many_connections",
+   "predicted": "db_too_many_connections",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_tls_required__1.log",
+   "expected": "db_tls_required",
+   "predicted": "db_tls_required",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "container_oom_killed__2.log",
+   "expected": "container_oom_killed",
+   "predicted": "container_oom_killed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "image_pull_not_found__2.log",
+   "expected": "image_pull_not_found",
+   "predicted": "image_pull_not_found",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "registry_auth_failed__2.log",
+   "expected": "registry_auth_failed",
+   "predicted": "registry_auth_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "npm_dependency_conflict__2.log",
+   "expected": "npm_dependency_conflict",
+   "predicted": "npm_dependency_conflict",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "native_module_build_failed__2.log",
+   "expected": "native_module_build_failed",
+   "predicted": "native_module_build_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "pip_no_matching_distribution__2.log",
+   "expected": "pip_no_matching_distribution",
+   "predicted": "pip_no_matching_distribution",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "dockerfile_copy_missing__2.log",
+   "expected": "dockerfile_copy_missing",
+   "predicted": "dockerfile_copy_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "port_already_in_use__2.log",
+   "expected": "port_already_in_use",
+   "predicted": "port_already_in_use",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "no_space_left__2.log",
+   "expected": "no_space_left",
+   "predicted": "no_space_left",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "env_var_missing__2.log",
+   "expected": "env_var_missing",
+   "predicted": "env_var_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "config_parse_error__2.log",
+   "expected": "config_parse_error",
+   "predicted": "config_parse_error",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "permission_denied__2.log",
+   "expected": "permission_denied",
+   "predicted": "permission_denied",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "tls_certificate_error__2.log",
+   "expected": "tls_certificate_error",
+   "predicted": "tls_certificate_error",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "insufficient_cluster_resources__2.log",
+   "expected": "insufficient_cluster_resources",
+   "predicted": "insufficient_cluster_resources",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "dns_resolution_failed__2.log",
+   "expected": "dns_resolution_failed",
+   "predicted": "dns_resolution_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "ci_tests_failed__2.log",
+   "expected": "ci_tests_failed",
+   "predicted": "ci_tests_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_connection_refused__2.log",
+   "expected": "db_connection_refused",
+   "predicted": "db_connection_refused",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_auth_failed__2.log",
+   "expected": "db_auth_failed",
+   "predicted": "db_auth_failed",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_database_missing__2.log",
+   "expected": "db_database_missing",
+   "predicted": "db_database_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_migration_missing__2.log",
+   "expected": "db_migration_missing",
+   "predicted": "db_migration_missing",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_timeout__2.log",
+   "expected": "db_timeout",
+   "predicted": "db_timeout",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_too_many_connections__2.log",
+   "expected": "db_too_many_connections",
+   "predicted": "db_too_many_connections",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  },
+  {
+   "file": "db_tls_required__2.log",
+   "expected": "db_tls_required",
+   "predicted": "db_tls_required",
+   "correct": true,
+   "confidence": "high",
+   "mode": "rules"
+  }
+ ]
+}

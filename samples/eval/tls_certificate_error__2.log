@@ -1,0 +1,11 @@
+{"time": "2026-10-01T09:00:01.188Z", "level": "info", "service": "kubelet", "msg": "Pulling image \"registry.example.com/team/quote-engine:1.9.18\""}
+{"time": "2026-10-01T09:00:02.689Z", "level": "info", "service": "kubelet", "msg": "Started container quote-engine"}
+{"time": "2026-10-01T09:00:06.060Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:06.214Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:07.319Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:07.550Z", "level": "info", "service": "quote-engine", "msg": "Starting quote-engine"}
+{"time": "2026-10-01T09:00:07.692Z", "level": "info", "service": "quote-engine", "msg": "Loading configuration"}
+{"time": "2026-10-01T09:00:07.847Z", "level": "error", "service": "quote-engine", "msg": "Error: certificate has expired (CERT_HAS_EXPIRED)"}
+{"time": "2026-10-01T09:00:10.929Z", "level": "error", "service": "quote-engine", "msg": "Startup dependency check failed, exiting"}
+{"time": "2026-10-01T09:00:13.080Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e"}
+{"time": "2026-10-01T09:00:15.417Z", "level": "error", "service": "kubelet", "msg": "Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff"}

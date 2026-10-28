@@ -1,0 +1,4 @@
+2026-10-01T09:00:00.951Z INFO [kubelet] Pulling image "private.registry.io/team/quote-engine:2.1.0"
+2026-10-01T09:00:03.773Z INFO [app] GET /health 200
+2026-10-01T09:00:05.093Z WARN [kubelet] Failed to pull image: pull access denied for private.registry.io/team/quote-engine, repository does not exist or may require 'docker login'
+2026-10-01T09:00:08.384Z WARN [kubelet] Error: ImagePullBackOff

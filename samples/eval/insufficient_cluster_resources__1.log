@@ -1,0 +1,4 @@
+2026-10-01T09:00:02.678Z INFO [deploy] Applying deployment "ledger" in namespace payments-dev
+2026-10-01T09:00:03.791Z INFO [app] Cache warmup complete
+2026-10-01T09:00:07.784Z WARN [default-scheduler] FailedScheduling pod/ledger-0e271365a6-7f5c0: 0/3 nodes are available: 3 Insufficient memory.
+2026-10-01T09:00:09.286Z ERROR [deploy] deployment "ledger" exceeded its progress deadline

@@ -1,0 +1,12 @@
+2026-10-28T08:20:01.0000000Z ##[group]Run kubectl apply -f k8s/
+2026-10-28T08:20:01.0000000Z kubectl apply -f k8s/ -n web-staging
+2026-10-28T08:20:01.0000000Z ##[endgroup]
+2026-10-28T08:20:03.4100000Z deployment.apps/storefront configured
+2026-10-28T08:20:03.4200000Z service/storefront unchanged
+2026-10-28T08:20:03.9000000Z ##[group]Run kubectl rollout status deployment/storefront -n web-staging --timeout=120s
+2026-10-28T08:20:04.1000000Z Waiting for deployment "storefront" rollout to finish: 1 out of 3 new replicas have been updated...
+2026-10-28T08:20:19.5500000Z Warning  Failed     pod/storefront-6f7d8c9b5a-mn4pq  Failed to pull image "ghcr.io/acme/storefront:v3.8.1-rc": rpc error: code = NotFound desc = failed to pull and unpack image "ghcr.io/acme/storefront:v3.8.1-rc": not found: manifest unknown
+2026-10-28T08:20:19.5600000Z Warning  Failed     pod/storefront-6f7d8c9b5a-mn4pq  Error: ErrImagePull
+2026-10-28T08:20:34.2000000Z Warning  Failed     pod/storefront-6f7d8c9b5a-mn4pq  Error: ImagePullBackOff
+2026-10-28T08:22:04.1000000Z error: deployment "storefront" exceeded its progress deadline
+2026-10-28T08:22:04.1100000Z ##[error]Process completed with exit code 1.

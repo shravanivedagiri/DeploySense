@@ -1,0 +1,232 @@
+[
+ {
+  "file": "container_oom_killed__1.log",
+  "expected": "container_oom_killed",
+  "style": "plain"
+ },
+ {
+  "file": "image_pull_not_found__1.log",
+  "expected": "image_pull_not_found",
+  "style": "plain"
+ },
+ {
+  "file": "registry_auth_failed__1.log",
+  "expected": "registry_auth_failed",
+  "style": "plain"
+ },
+ {
+  "file": "npm_dependency_conflict__1.log",
+  "expected": "npm_dependency_conflict",
+  "style": "plain"
+ },
+ {
+  "file": "native_module_build_failed__1.log",
+  "expected": "native_module_build_failed",
+  "style": "plain"
+ },
+ {
+  "file": "pip_no_matching_distribution__1.log",
+  "expected": "pip_no_matching_distribution",
+  "style": "json"
+ },
+ {
+  "file": "dockerfile_copy_missing__1.log",
+  "expected": "dockerfile_copy_missing",
+  "style": "plain"
+ },
+ {
+  "file": "port_already_in_use__1.log",
+  "expected": "port_already_in_use",
+  "style": "json"
+ },
+ {
+  "file": "no_space_left__1.log",
+  "expected": "no_space_left",
+  "style": "json"
+ },
+ {
+  "file": "env_var_missing__1.log",
+  "expected": "env_var_missing",
+  "style": "iso"
+ },
+ {
+  "file": "config_parse_error__1.log",
+  "expected": "config_parse_error",
+  "style": "iso"
+ },
+ {
+  "file": "permission_denied__1.log",
+  "expected": "permission_denied",
+  "style": "plain"
+ },
+ {
+  "file": "tls_certificate_error__1.log",
+  "expected": "tls_certificate_error",
+  "style": "iso"
+ },
+ {
+  "file": "insufficient_cluster_resources__1.log",
+  "expected": "insufficient_cluster_resources",
+  "style": "iso"
+ },
+ {
+  "file": "dns_resolution_failed__1.log",
+  "expected": "dns_resolution_failed",
+  "style": "iso"
+ },
+ {
+  "file": "ci_tests_failed__1.log",
+  "expected": "ci_tests_failed",
+  "style": "iso"
+ },
+ {
+  "file": "db_connection_refused__1.log",
+  "expected": "db_connection_refused",
+  "style": "iso"
+ },
+ {
+  "file": "db_auth_failed__1.log",
+  "expected": "db_auth_failed",
+  "style": "plain"
+ },
+ {
+  "file": "db_database_missing__1.log",
+  "expected": "db_database_missing",
+  "style": "json"
+ },
+ {
+  "file": "db_migration_missing__1.log",
+  "expected": "db_migration_missing",
+  "style": "plain"
+ },
+ {
+  "file": "db_timeout__1.log",
+  "expected": "db_timeout",
+  "style": "json"
+ },
+ {
+  "file": "db_too_many_connections__1.log",
+  "expected": "db_too_many_connections",
+  "style": "plain"
+ },
+ {
+  "file": "db_tls_required__1.log",
+  "expected": "db_tls_required",
+  "style": "iso"
+ },
+ {
+  "file": "container_oom_killed__2.log",
+  "expected": "container_oom_killed",
+  "style": "iso"
+ },
+ {
+  "file": "image_pull_not_found__2.log",
+  "expected": "image_pull_not_found",
+  "style": "iso"
+ },
+ {
+  "file": "registry_auth_failed__2.log",
+  "expected": "registry_auth_failed",
+  "style": "iso"
+ },
+ {
+  "file": "npm_dependency_conflict__2.log",
+  "expected": "npm_dependency_conflict",
+  "style": "iso"
+ },
+ {
+  "file": "native_module_build_failed__2.log",
+  "expected": "native_module_build_failed",
+  "style": "iso"
+ },
+ {
+  "file": "pip_no_matching_distribution__2.log",
+  "expected": "pip_no_matching_distribution",
+  "style": "plain"
+ },
+ {
+  "file": "dockerfile_copy_missing__2.log",
+  "expected": "dockerfile_copy_missing",
+  "style": "iso"
+ },
+ {
+  "file": "port_already_in_use__2.log",
+  "expected": "port_already_in_use",
+  "style": "plain"
+ },
+ {
+  "file": "no_space_left__2.log",
+  "expected": "no_space_left",
+  "style": "plain"
+ },
+ {
+  "file": "env_var_missing__2.log",
+  "expected": "env_var_missing",
+  "style": "json"
+ },
+ {
+  "file": "config_parse_error__2.log",
+  "expected": "config_parse_error",
+  "style": "json"
+ },
+ {
+  "file": "permission_denied__2.log",
+  "expected": "permission_denied",
+  "style": "iso"
+ },
+ {
+  "file": "tls_certificate_error__2.log",
+  "expected": "tls_certificate_error",
+  "style": "json"
+ },
+ {
+  "file": "insufficient_cluster_resources__2.log",
+  "expected": "insufficient_cluster_resources",
+  "style": "json"
+ },
+ {
+  "file": "dns_resolution_failed__2.log",
+  "expected": "dns_resolution_failed",
+  "style": "json"
+ },
+ {
+  "file": "ci_tests_failed__2.log",
+  "expected": "ci_tests_failed",
+  "style": "json"
+ },
+ {
+  "file": "db_connection_refused__2.log",
+  "expected": "db_connection_refused",
+  "style": "json"
+ },
+ {
+  "file": "db_auth_failed__2.log",
+  "expected": "db_auth_failed",
+  "style": "iso"
+ },
+ {
+  "file": "db_database_missing__2.log",
+  "expected": "db_database_missing",
+  "style": "plain"
+ },
+ {
+  "file": "db_migration_missing__2.log",
+  "expected": "db_migration_missing",
+  "style": "iso"
+ },
+ {
+  "file": "db_timeout__2.log",
+  "expected": "db_timeout",
+  "style": "plain"
+ },
+ {
+  "file": "db_too_many_connections__2.log",
+  "expected": "db_too_many_connections",
+  "style": "iso"
+ },
+ {
+  "file": "db_tls_required__2.log",
+  "expected": "db_tls_required",
+  "style": "json"
+ }
+]

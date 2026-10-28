@@ -1,0 +1,23 @@
+2026-10-28T09:14:02.118Z INFO [deploy] Applying deployment "checkout-api" in namespace payments-staging (image registry.example.com/shop/checkout-api:2.14.0)
+2026-10-28T09:14:04.530Z INFO [kubelet] Pulling image "registry.example.com/shop/checkout-api:2.14.0"
+2026-10-28T09:14:11.902Z INFO [kubelet] Successfully pulled image "registry.example.com/shop/checkout-api:2.14.0" in 7.3s
+2026-10-28T09:14:12.240Z INFO [kubelet] Created container checkout-api
+2026-10-28T09:14:12.611Z INFO [kubelet] Started container checkout-api
+2026-10-28T09:14:13.004Z INFO [checkout-api] Starting checkout-api v2.14.0 (node v20.11.1)
+2026-10-28T09:14:13.420Z INFO [checkout-api] Connected to database orders-db:5432
+2026-10-28T09:14:13.902Z INFO [checkout-api] Loading product catalog cache into memory
+2026-10-28T09:14:14.118Z INFO [checkout-api] HTTP server listening on port 8080
+2026-10-28T09:14:19.533Z WARN [checkout-api] Catalog cache size 412MB, still loading (68% complete)
+2026-10-28T09:14:22.871Z WARN [checkout-api] GC pause 1840ms, heap used 489MB of 512MB limit
+2026-10-28T09:14:24.006Z ERROR [checkout-api] FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+2026-10-28T09:14:24.410Z WARN [kubelet] Container checkout-api in pod checkout-api-7d9f8b6c4d-x2klp was OOMKilled (exit code 137)
+2026-10-28T09:14:25.002Z WARN [kubelet] Readiness probe failed: Get "http://[IP]:8080/health": dial tcp [IP]:8080: connect: connection refused
+2026-10-28T09:14:31.220Z INFO [kubelet] Started container checkout-api
+2026-10-28T09:14:31.640Z INFO [checkout-api] Starting checkout-api v2.14.0 (node v20.11.1)
+2026-10-28T09:14:32.115Z INFO [checkout-api] Loading product catalog cache into memory
+2026-10-28T09:14:41.870Z ERROR [checkout-api] FATAL ERROR: Reached heap limit Allocation failed - JavaScript heap out of memory
+2026-10-28T09:14:42.301Z WARN [kubelet] Container checkout-api in pod checkout-api-7d9f8b6c4d-x2klp was OOMKilled (exit code 137)
+2026-10-28T09:14:43.000Z WARN [kubelet] Back-off restarting failed container checkout-api in pod checkout-api-7d9f8b6c4d-x2klp
+2026-10-28T09:14:58.414Z ERROR [kubelet] Pod checkout-api-7d9f8b6c4d-x2klp status CrashLoopBackOff
+2026-10-28T09:15:02.733Z ERROR [ingress-nginx] upstream connect error or disconnect/reset before headers, 503 Service Unavailable for host checkout.staging.example.com
+2026-10-28T09:16:12.118Z ERROR [deploy] deployment "checkout-api" exceeded its progress deadline

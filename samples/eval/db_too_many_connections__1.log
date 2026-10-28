@@ -1,0 +1,9 @@
+INFO: Cache warmup complete
+INFO: Pulling image "registry.example.com/team/ledger:1.2.19"
+INFO: Started container ledger
+INFO: Starting ledger
+INFO: Successfully pulled image in 2.1s
+INFO: Loading configuration
+INFO: Scaled to 12 replicas
+ERROR: FATAL: sorry, too many clients already
+ERROR: GET /search 500

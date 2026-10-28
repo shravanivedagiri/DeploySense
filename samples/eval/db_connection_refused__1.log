@@ -1,0 +1,11 @@
+2026-10-01T09:00:03.241Z INFO [kubelet] Pulling image "registry.example.com/team/ledger:1.2.17"
+2026-10-01T09:00:04.233Z DEBUG [app] gc cycle finished
+2026-10-01T09:00:06.494Z INFO [kubelet] Started container ledger
+2026-10-01T09:00:08.792Z INFO [ledger] Starting ledger
+2026-10-01T09:00:12.063Z INFO [ledger] Loading configuration
+2026-10-01T09:00:14.202Z DEBUG [app] gc cycle finished
+2026-10-01T09:00:15.632Z ERROR [ledger.db] Error: connect ECONNREFUSED [IP]:5432
+2026-10-01T09:00:18.318Z ERROR [ledger] Database unavailable, exiting
+2026-10-01T09:00:19.311Z WARN [kubelet] Readiness probe failed: HTTP probe failed with statuscode: 503
+2026-10-01T09:00:21.902Z WARN [kubelet] Back-off restarting failed container ledger in pod ledger-0e271365a6-7f5c0
+2026-10-01T09:00:25.305Z ERROR [kubelet] Pod ledger-0e271365a6-7f5c0 status CrashLoopBackOff

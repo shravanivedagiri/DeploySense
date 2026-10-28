@@ -1,0 +1,10 @@
+{"time": "2026-10-01T09:00:03.645Z", "level": "info", "service": "kubelet", "msg": "Successfully pulled image in 2.1s"}
+{"time": "2026-10-01T09:00:05.797Z", "level": "info", "service": "kubelet", "msg": "Pulling image \"registry.example.com/team/quote-engine:1.2.14\""}
+{"time": "2026-10-01T09:00:08.623Z", "level": "info", "service": "kubelet", "msg": "Started container quote-engine"}
+{"time": "2026-10-01T09:00:09.857Z", "level": "info", "service": "quote-engine", "msg": "Starting quote-engine"}
+{"time": "2026-10-01T09:00:12.389Z", "level": "info", "service": "quote-engine", "msg": "Loading configuration"}
+{"time": "2026-10-01T09:00:13.461Z", "level": "error", "service": "quote-engine.db", "msg": "Error: connect ECONNREFUSED [IP]:5432"}
+{"time": "2026-10-01T09:00:16.378Z", "level": "error", "service": "quote-engine", "msg": "Database unavailable, exiting"}
+{"time": "2026-10-01T09:00:17.658Z", "level": "warn", "service": "kubelet", "msg": "Readiness probe failed: HTTP probe failed with statuscode: 503"}
+{"time": "2026-10-01T09:00:17.923Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e"}
+{"time": "2026-10-01T09:00:19.884Z", "level": "error", "service": "kubelet", "msg": "Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff"}

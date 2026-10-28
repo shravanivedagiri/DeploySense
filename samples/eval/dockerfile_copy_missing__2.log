@@ -1,0 +1,4 @@
+2026-10-01T09:00:01.464Z INFO [build] Step 6/9 : COPY dist/ /app/dist/
+2026-10-01T09:00:03.813Z INFO [app] GET /health 200
+2026-10-01T09:00:05.771Z INFO [app] GET /health 200
+2026-10-01T09:00:07.655Z ERROR [build] failed to compute cache key: failed to calculate checksum of ref abc: "/dist": not found

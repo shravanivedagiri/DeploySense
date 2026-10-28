@@ -1,0 +1,9 @@
+2026-10-01T09:00:01.906Z INFO [kubelet] Pulling image "registry.example.com/team/quote-engine:1.2.4"
+2026-10-01T09:00:02.000Z DEBUG [app] gc cycle finished
+2026-10-01T09:00:03.158Z INFO [kubelet] Started container quote-engine
+2026-10-01T09:00:04.729Z INFO [quote-engine] Starting quote-engine
+2026-10-01T09:00:06.156Z INFO [quote-engine] Loading configuration
+2026-10-01T09:00:08.476Z ERROR [quote-engine.db] FATAL: password authentication failed for user "app"
+2026-10-01T09:00:09.881Z ERROR [quote-engine] Could not connect to database, exiting
+2026-10-01T09:00:10.962Z WARN [kubelet] Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e
+2026-10-01T09:00:11.183Z ERROR [kubelet] Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff

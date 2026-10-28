@@ -1,0 +1,10 @@
+INFO: Pulling image "registry.example.com/team/quote-engine:1.3.17"
+INFO: GET /health 200
+INFO: Started container quote-engine
+INFO: Starting quote-engine
+INFO: Cache warmup complete
+INFO: Loading configuration
+ERROR: connect ETIMEDOUT [IP]:5432 to postgres
+ERROR: Database unavailable, exiting
+WARN: Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e
+ERROR: Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff

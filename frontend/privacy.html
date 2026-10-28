@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy policy | DeploySense AI</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/"><img src="/favicon.svg" width="24" height="24" alt=""><span>DeploySense</span></a>
+  </header>
+  <main class="legal">
+    <h1>Privacy policy</h1>
+    <p class="updated">Last updated: 28 October 2026</p>
+
+    <h2>Who runs this service</h2>
+    <p>DeploySense AI is operated by <span class="todo">[team or organisation name]</span>. Contact: <span class="todo">[contact email]</span>.</p>
+
+    <h2>What we process</h2>
+    <p>When you analyse a log, we process the deployment log text you paste or upload, and the optional successful-run log you provide for comparison. We do not ask for your name, email address or any account details, and the service has no sign-in.</p>
+
+    <h2>Masking before analysis</h2>
+    <p>Before a log is analysed, DeploySense replaces passwords, tokens, API keys, connection-string credentials, AWS access keys, GitHub tokens, email addresses and IPv4 addresses with placeholders such as [MASKED] and [IP]. Masking is pattern based and cannot recognise every secret format, so remove anything sensitive that it would not detect before you upload.</p>
+
+    <h2>AI processing</h2>
+    <p>When AI reasoning is switched on, an excerpt of the masked log (the error lines and the lines around them) is sent to Groq, Inc. to run the language model. Groq processes the excerpt under its own terms and privacy policy. When AI reasoning is off, the log is analysed only on the DeploySense server and is not sent to any third party.</p>
+
+    <h2>What we store</h2>
+    <p>Uploaded logs and analysis results are held in memory only for the duration of the request and are not written to disk or kept after the response is sent.</p>
+    <p>If you rate a diagnosis as useful or not useful, we store the rating, a random analysis identifier, the identifier of the diagnosed root cause and the time of the rating. Ratings do not contain log content. We use them only to measure and improve the accuracy of the service. Ratings are kept for <span class="todo">[retention period, for example 12 months]</span>.</p>
+
+    <h2>Cookies and tracking</h2>
+    <p>DeploySense does not set cookies and does not use analytics, advertising or tracking scripts. Fonts and scripts are served from our own server.</p>
+
+    <h2>Server logs</h2>
+    <p>Our hosting provider may record standard request information such as IP address, time and requested path for security and operations. <span class="todo">[Name the hosting provider and its log retention period.]</span></p>
+
+    <h2>Your choices</h2>
+    <p>You can use the service with AI reasoning switched off so that no log content leaves our server. To ask about or delete feedback ratings, contact us at the address above.</p>
+
+    <h2>Changes</h2>
+    <p>We will update the date at the top of this page when this policy changes.</p>
+  </main>
+  <footer class="footer"><span>DeploySense AI</span><nav aria-label="Legal"><a href="/privacy">Privacy policy</a><a href="/terms">Terms and conditions</a></nav></footer>
+</body>
+</html>

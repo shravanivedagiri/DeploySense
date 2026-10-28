@@ -1,0 +1,11 @@
+{"time": "2026-10-01T09:00:03.613Z", "level": "debug", "service": "app", "msg": "gc cycle finished"}
+{"time": "2026-10-01T09:00:04.191Z", "level": "info", "service": "app", "msg": "Cache warmup complete"}
+{"time": "2026-10-01T09:00:06.129Z", "level": "debug", "service": "app", "msg": "gc cycle finished"}
+{"time": "2026-10-01T09:00:06.256Z", "level": "info", "service": "kubelet", "msg": "Pulling image \"registry.example.com/team/quote-engine:1.7.8\""}
+{"time": "2026-10-01T09:00:07.725Z", "level": "info", "service": "kubelet", "msg": "Started container quote-engine"}
+{"time": "2026-10-01T09:00:10.070Z", "level": "info", "service": "quote-engine", "msg": "Starting quote-engine"}
+{"time": "2026-10-01T09:00:11.861Z", "level": "info", "service": "quote-engine", "msg": "Loading configuration"}
+{"time": "2026-10-01T09:00:15.736Z", "level": "error", "service": "quote-engine", "msg": "error converting YAML to JSON: yaml: line 22: mapping values are not allowed in this context"}
+{"time": "2026-10-01T09:00:19.565Z", "level": "warn", "service": "kubelet", "msg": "Container quote-engine exited with code 1"}
+{"time": "2026-10-01T09:00:20.742Z", "level": "warn", "service": "kubelet", "msg": "Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e"}
+{"time": "2026-10-01T09:00:23.368Z", "level": "error", "service": "kubelet", "msg": "Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff"}

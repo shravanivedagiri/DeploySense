@@ -1,0 +1,7 @@
+DEBUG: gc cycle finished
+INFO: Step 5/9 : RUN npm ci
+INFO: GET /health 200
+WARN: prebuild-install warn install No prebuilt binaries found (target=20.11.1 runtime=node arch=x64)
+ERROR: gyp ERR! build error
+ERROR: gyp ERR! stack Error: `make` failed with exit code: 2
+ERROR: The command '/bin/sh -c npm ci' returned a non-zero code: 1

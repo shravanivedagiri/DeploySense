@@ -1,0 +1,6 @@
+2026-10-01T09:00:01.711Z INFO [build] Step 5/9 : RUN npm ci
+2026-10-01T09:00:05.415Z WARN [build] prebuild-install warn install No prebuilt binaries found (target=20.11.1 runtime=node arch=x64)
+2026-10-01T09:00:07.490Z INFO [app] GET /health 200
+2026-10-01T09:00:08.236Z ERROR [build] gyp ERR! build error
+2026-10-01T09:00:11.051Z ERROR [build] gyp ERR! stack Error: `make` failed with exit code: 2
+2026-10-01T09:00:14.540Z ERROR [build] The command '/bin/sh -c npm ci' returned a non-zero code: 1

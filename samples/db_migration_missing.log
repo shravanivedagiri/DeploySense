@@ -1,0 +1,10 @@
+{"time":"2026-10-28T13:40:01.112Z","level":"info","service":"billing-api","msg":"starting billing-api","version":"7.3.0"}
+{"time":"2026-10-28T13:40:01.540Z","level":"info","service":"billing-api","msg":"connected to postgres","host":"billing-db","database":"billing"}
+{"time":"2026-10-28T13:40:01.902Z","level":"info","service":"billing-api","msg":"HTTP server listening on :3000"}
+{"time":"2026-10-28T13:40:15.330Z","level":"info","service":"billing-api","msg":"POST /v2/invoices 201","duration_ms":41}
+{"time":"2026-10-28T13:40:17.881Z","level":"error","service":"billing-api","msg":"query failed","error":"relation \"invoice_line_discounts\" does not exist"}
+{"time":"2026-10-28T13:40:17.883Z","level":"error","service":"billing-api","msg":"POST /v2/invoices/finalize 500","duration_ms":12}
+{"time":"2026-10-28T13:40:22.004Z","level":"error","service":"billing-api","msg":"query failed","error":"relation \"invoice_line_discounts\" does not exist"}
+{"time":"2026-10-28T13:40:22.006Z","level":"error","service":"billing-api","msg":"POST /v2/invoices/finalize 500","duration_ms":9}
+{"time":"2026-10-28T13:40:30.450Z","level":"warn","service":"billing-api","msg":"error rate 38% over last 60s exceeds threshold 5%"}
+{"time":"2026-10-28T13:40:31.000Z","level":"error","service":"deploy-gate","msg":"canary analysis failed for billing-api 7.3.0, rolling back"}

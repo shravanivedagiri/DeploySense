@@ -1,0 +1,10 @@
+INFO: Pulling image "registry.example.com/team/quote-engine:1.4.15"
+INFO: GET /health 200
+DEBUG: gc cycle finished
+INFO: Started container quote-engine
+INFO: Starting quote-engine
+INFO: Loading configuration
+ERROR: FATAL: database "ledger_prod" does not exist
+ERROR: Database initialization failed
+WARN: Back-off restarting failed container quote-engine in pod quote-engine-f903ce86bf-0902e
+ERROR: Pod quote-engine-f903ce86bf-0902e status CrashLoopBackOff

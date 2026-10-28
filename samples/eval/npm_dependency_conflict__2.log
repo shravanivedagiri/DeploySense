@@ -1,0 +1,5 @@
+2026-10-01T09:00:00.665Z DEBUG [app] gc cycle finished
+2026-10-01T09:00:01.781Z INFO [build] Step 4/8 : RUN npm install
+2026-10-01T09:00:05.477Z ERROR [build] npm ERR! code ERESOLVE
+2026-10-01T09:00:06.119Z ERROR [build] npm ERR! ERESOLVE unable to resolve dependency tree
+2026-10-01T09:00:08.114Z ERROR [build] The command '/bin/sh -c npm install' returned a non-zero code: 1

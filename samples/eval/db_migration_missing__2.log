@@ -1,0 +1,9 @@
+2026-10-01T09:00:03.426Z DEBUG [app] gc cycle finished
+2026-10-01T09:00:03.873Z INFO [kubelet] Pulling image "registry.example.com/team/quote-engine:1.2.10"
+2026-10-01T09:00:04.542Z INFO [kubelet] Started container quote-engine
+2026-10-01T09:00:06.258Z INFO [quote-engine] Starting quote-engine
+2026-10-01T09:00:08.741Z INFO [quote-engine] Loading configuration
+2026-10-01T09:00:08.991Z INFO [quote-engine] HTTP server listening on port 8080
+2026-10-01T09:00:10.684Z ERROR [quote-engine] SQLSTATE[42S02]: Table 'shop.order_refunds' doesn't exist
+2026-10-01T09:00:10.856Z ERROR [quote-engine] GET /orders/refunds 500
+2026-10-01T09:00:12.163Z ERROR [ingress-nginx] 502 Bad Gateway: no healthy upstream for quote-engine.example.com
